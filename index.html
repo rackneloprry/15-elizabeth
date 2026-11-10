@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis 15 Años - Elizabeth</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --navy-blue: #172554; --primary-blue: #1e3a8a; }
+        body { background-color: #e5e7eb; font-family: 'Lato', sans-serif; color: var(--navy-blue); margin: 0; padding: 0; }
+        .font-script { font-family: 'Great Vibes', cursive; }
+        .mobile-container { width: 100%; max-width: 450px; margin: 0 auto; background-color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; overflow-x: hidden; min-height: 100vh; }
+        .bg-section-1, .bg-section-2, .bg-section-3 { background-size: cover; background-position: center; background-repeat: no-repeat; }
+        .bg-section-1 { background-image: url('https://i.postimg.cc/mD5BkkQC/Gemini-Generated-Image-nnkz2qnnkz2qnnkz.jpg'); }
+        .bg-section-2, .bg-section-3 { background-image: url('https://i.postimg.cc/JzpkxcmL/Gemini-Generated-Image-j742sj742sj742sj.jpg'); }
+        .glass-panel { background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(6px); border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
+        .play-btn { background-color: var(--primary-blue); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; }
+        .play-btn:active { transform: scale(0.95); }
+        .checkbox-label { display: flex; align-items: center; color: var(--navy-blue); font-weight: 600; font-size: 0.92rem; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.7); border: 1px solid rgba(30, 58, 138, 0.15); transition: background-color 0.2s; }
+        .checkbox-custom { width: 18px; height: 18px; accent-color: var(--primary-blue); margin-right: 10px; cursor: pointer; }
+        .mesa-node { width: 48px; height: 48px; border-radius: 50%; background: white; border: 2px solid #93c5fd; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #1e3a8a; transition: all 0.3s ease; }
+        .mesa-activa { background: #1e3a8a !important; color: #ffffff !important; border-color: #fbbf24 !important; border-width: 3px !important; transform: scale(1.18); box-shadow: 0 0 15px rgba(251, 191, 36, 0.8); }
+        .countdown-box { display: flex; flex-direction: column; align-items: center; }
+        .countdown-number { font-size: 1.8rem; font-weight: 700; color: var(--primary-blue); }
+        .countdown-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; }
+        .countdown-separator { font-size: 1.5rem; font-weight: bold; color: var(--primary-blue); margin-top: 0.2rem; }
+    </style>
+</head>
+<body>
+
+<div class="mobile-container" id="mobile-wrap">
+
+    <!-- PANEL ADMIN SECRETO -->
+    <div id="admin-modal" class="hidden fixed inset-0 bg-blue-950/90 z-[100] overflow-y-auto p-4 text-left">
+        <div class="bg-white rounded-2xl max-w-md mx-auto p-5 shadow-2xl border border-blue-200">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+                <div>
+                    <h3 class="font-bold text-lg text-blue-900"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Panel de Envíos SaaS</h3>
+                    <p class="text-xs text-gray-500">Genera links que abren en automático</p>
+                </div>
+                <button onclick="cerrarAdmin()" class="text-gray-400 hover:text-red-500 text-xl font-bold px-2">&times;</button>
+            </div>
+            <div class="mb-4 bg-blue-50 p-3 rounded-xl border border-blue-200">
+                <label class="block text-xs font-bold text-blue-900 mb-1">1. Enlace base de GitHub Pages:</label>
+                <input type="text" id="admin-base-url" class="w-full px-3 py-1.5 rounded border border-blue-300 text-xs font-mono bg-white" readonly>
+            </div>
+            <div id="admin-guest-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+        </div>
+    </div>
+
+    <!-- PANTALLA DE BIENVENIDA -->
+    <div id="invitation-overlay" class="absolute top-0 left-0 w-full h-full z-50 transition-opacity duration-500 bg-white">
+        <div class="sticky top-0 w-full h-screen flex flex-col items-center justify-center bg-section-1 px-4">
+            <div class="glass-panel p-7 flex flex-col items-center justify-center text-center shadow-xl border border-white/60 w-full max-w-sm">
+                <!-- Toca 3 veces para Admin -->
+                <h2 onclick="toqueSecretoAdmin()" class="font-script text-5xl text-blue-900 mb-1 select-none cursor-pointer">Mis 15 Años</h2>
+                <p class="font-script text-4xl text-blue-800 mb-5">Elizabeth</p>
+
+                <!-- INFO AUTOMÁTICA DEL INVITADO -->
+                <div id="guest-info-container" class="hidden flex-col items-center mb-6 w-full bg-blue-950/5 border border-blue-900/20 rounded-xl p-4">
+                    <p class="text-[0.65rem] uppercase tracking-widest text-blue-900 font-bold">¡Bienvenidos! Invitación especial para:</p>
+                    <p id="guest-name-display" class="font-script text-3xl text-blue-900 leading-tight text-center my-1.5">Invitado Especial</p>
+                    <div class="flex items-center space-x-2 mt-1">
+                        <span class="bg-blue-900 text-white text-xs font-bold px-3 py-0.5 rounded-full"><i class="fa-solid fa-ticket mr-1"></i> Pases: <span id="guest-passes-display">1</span></span>
+                        <span class="bg-amber-500 text-blue-950 text-xs font-bold px-3 py-0.5 rounded-full"><i class="fa-solid fa-chair mr-1"></i> <span id="guest-table-badge">Mesa 1</span></span>
+                    </div>
+                </div>
+                
+                <div class="relative inline-flex items-center justify-center mt-1">
+                    <button type="button" onclick="abrirInvitacion();" class="bg-blue-900 text-white px-7 py-3 rounded-full font-bold shadow-lg flex items-center space-x-2 animate-bounce cursor-pointer hover:bg-blue-800 transition">
+                        <i class="fa-regular fa-envelope-open text-xl"></i>
+                        <span class="text-sm tracking-wider uppercase">Abrir Invitación</span>
+                    </button>
+                    <!-- Bloqueador Chrome -->
+                    <div id="yt-click-catcher" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 56px; overflow: hidden; opacity: 0.001; z-index: 60; cursor: pointer;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 200px;">
+                            <iframe id="youtube-player" width="280" height="200" src="https://www.youtube.com/embed/sfYbUHWPyBw?enablejsapi=1&playsinline=1&controls=0&rel=0&loop=1&playlist=sfYbUHWPyBw" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[0.7rem] text-blue-900 mt-3 italic opacity-80">Toca el botón para abrir y escuchar la música</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SECCIÓN 1: PORTADA -->
+    <section class="bg-section-1 min-h-screen relative flex flex-col items-center justify-between py-12 px-6">
+        <div class="w-full relative mt-6 flex flex-col items-center">
+            <div class="relative flex items-center justify-center w-full">
+                <span class="font-script text-5xl text-blue-900 absolute left-8 top-2">Mis</span>
+                <span class="font-script text-[10.5rem] leading-none text-blue-900">15</span>
+            </div>
+            <div class="flex items-center justify-center -mt-6 z-10"><span class="font-script text-5xl text-blue-900">Años</span></div>
+            <div class="font-script text-[4.8rem] text-blue-900 text-center -mt-2 leading-tight">Elizabeth</div>
+        </div>
+        <div class="mt-auto mb-6 text-center px-4 w-full z-10 relative">
+            <p class="text-[0.95rem] font-semibold text-blue-900 mb-6 italic leading-relaxed">Hace 15 años Dios me concedió<br>la vida y doy fe de su fidelidad<br>y amor, teniendo la certeza<br>que el siempre estará conmigo<br>bendiciendo de mi vida,<br>con Acción de Gracias<br>quiero celebrar mis 15 años.</p>
+            <div onclick="toggleMusica()" class="glass-panel py-3 px-6 flex flex-col items-center justify-center mx-auto w-48 shadow-sm cursor-pointer select-none relative z-20">
+                <div class="play-btn mb-2"><i id="mute-icon" class="fa-solid fa-volume-xmark"></i></div>
+                <p id="mute-text" class="font-script text-2xl text-blue-900 mt-1 leading-none">Activar música</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 2: FECHA -->
+    <section class="bg-section-2 min-h-screen relative flex flex-col items-center py-12 px-6">
+        <div class="relative mt-4">
+            <div class="w-56 h-72 rounded-t-full rounded-b-md overflow-hidden border-4 border-white shadow-lg relative z-10">
+                <img src="https://lh3.googleusercontent.com/d/1vCMQCZItN4-nKu0GQzKOOojfCsNL1E5r" alt="Elizabeth" class="w-full h-full object-cover">
+            </div>
+        </div>
+        <p class="text-center text-[0.95rem] font-semibold text-blue-900 italic mb-5 mt-6 leading-relaxed">Es mi deseo y el de mi familia<br>que compartan conmigo<br>este día tan especial.</p>
+        <p class="text-xs font-bold text-blue-900 uppercase tracking-widest mb-1">Reserva la fecha:</p>
+        <div class="flex items-end justify-center w-full">
+            <span class="font-script text-4xl text-blue-900 mb-3">Domingo</span>
+            <span class="font-script text-[6.5rem] leading-none text-blue-900 mx-3">13</span>
+            <span class="font-script text-4xl text-blue-900 mb-3">Diciembre</span>
+        </div>
+        <div class="flex items-center justify-center -mt-2 mb-2 w-full">
+            <span class="text-xl text-blue-900 font-bold italic mx-2">2026</span>
+        </div>
+        <p class="text-sm font-bold text-blue-900 mt-1">Hora: 10:00am</p>
+        <div class="glass-panel w-full mt-6 p-4 flex justify-around items-start">
+            <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Días</span></div><span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Horas</span></div><span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutos</span></div><span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Segundos</span></div>
+        </div>
+    </section>
+
+    <!-- SECCIÓN 3: RSVP Y GALERÍA -->
+    <section class="bg-section-3 min-h-screen relative flex flex-col items-center py-12 px-5 overflow-hidden">
+        <div class="text-center mb-6 mt-2 relative z-10">
+            <h3 class="font-script text-5xl text-blue-900 mb-2">Recepción:</h3>
+            <div class="flex items-center justify-center text-blue-900 mb-1">
+                <i class="fa-solid fa-location-dot text-2xl mr-3"></i>
+                <p class="text-[0.95rem] font-semibold italic leading-tight">Rancho La Sagrada Familia,<br>Playa San Diego.</p>
+            </div>
+            <div class="flex items-center justify-center space-x-3 mt-4">
+                <a href="https://maps.app.goo.gl/kvcyPASZp8dUfoW48" target="_blank" class="bg-white border border-blue-200 text-blue-900 px-4 py-2 rounded-full font-bold text-xs"><i class="fa-solid fa-map-location-dot text-green-600 mr-2"></i> Maps</a>
+                <a href="https://waze.com/ul?q=Rancho+La+Sagrada+Familia,+Playa+San+Diego" target="_blank" class="bg-white border border-blue-200 text-blue-900 px-4 py-2 rounded-full font-bold text-xs"><i class="fa-brands fa-waze text-blue-500 mr-2"></i> Waze</a>
+            </div>
+        </div>
+
+        <!-- TARJETA RSVP -->
+        <div class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <h3 class="font-script text-4xl text-blue-900 mb-2">Confirmación</h3>
+            <div id="rsvp-dynamic-form" class="text-left w-full mb-5 hidden">
+                <p class="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide"><i class="fa-regular fa-square-check mr-1"></i> Confirma quiénes asistirán:</p>
+                <div id="checkbox-list" class="flex flex-col space-y-2"></div>
+            </div>
+            <button onclick="enviarConfirmacionWhatsApp()" class="w-full bg-green-600 text-white font-bold text-sm px-6 py-3 rounded-full flex justify-center items-center shadow-md">
+                <i class="fa-brands fa-whatsapp text-xl mr-2"></i> Confirmar por WhatsApp
+            </button>
+        </div>
+
+        <!-- PASE Y CROQUIS -->
+        <div id="pass-qr-section" class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <h3 class="font-script text-4xl text-blue-900 mb-2">Tu Pase y Mesa</h3>
+            <div id="qr-ticket-card" class="hidden flex-col items-center bg-white p-4 rounded-xl shadow-inner border border-blue-200 mb-4">
+                <span id="qr-pass-id" class="text-[0.65rem] uppercase tracking-widest text-blue-800 font-bold">Pase Oficial</span>
+                <img id="qr-image" src="" alt="QR" class="w-36 h-36 border-4 border-blue-900 rounded-lg p-1 my-2">
+                <div class="flex items-center space-x-3 text-xs font-bold text-blue-900">
+                    <span id="qr-table-number" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full">Mesa</span>
+                </div>
+            </div>
+            <div class="bg-blue-950/5 rounded-xl p-3 border border-blue-900/15">
+                <p class="text-[0.7rem] font-bold text-white bg-blue-900 py-1.5 rounded mb-3">MESA PRINCIPAL (ELIZABETH)</p>
+                <div class="grid grid-cols-4 gap-2.5 justify-items-center my-2 px-1">
+                    <div id="croquis-Mesa 1" class="mesa-node"><span>Mesa</span><span class="text-xs">1</span></div>
+                    <div id="croquis-Mesa 2" class="mesa-node"><span>Mesa</span><span class="text-xs">2</span></div>
+                    <div id="croquis-Mesa 3" class="mesa-node"><span>Mesa</span><span class="text-xs">3</span></div>
+                    <div id="croquis-Mesa 4" class="mesa-node"><span>Mesa</span><span class="text-xs">4</span></div>
+                    <div id="croquis-Mesa 5" class="mesa-node"><span>Mesa</span><span class="text-xs">5</span></div>
+                    <div id="croquis-Mesa 6" class="mesa-node"><span>Mesa</span><span class="text-xs">6</span></div>
+                    <div id="croquis-Mesa 7" class="mesa-node"><span>Mesa</span><span class="text-xs">7</span></div>
+                    <div id="croquis-Mesa 8" class="mesa-node"><span>Mesa</span><span class="text-xs">8</span></div>
+                    <div id="croquis-Mesa 9" class="mesa-node"><span>Mesa</span><span class="text-xs">9</span></div>
+                    <div id="croquis-Mesa 10" class="mesa-node"><span>Mesa</span><span class="text-xs">10</span></div>
+                    <div id="croquis-Mesa 11" class="mesa-node"><span>Mesa</span><span class="text-xs">11</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- GALERÍA HÍBRIDA EN GOOGLE SITES -->
+        <div class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <i class="fa-solid fa-camera-retro text-3xl text-blue-900 mb-1"></i>
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Galería de Fotos</h3>
+            <p class="text-xs text-blue-900 mb-4">Visita nuestro sitio oficial para ver y subir fotos del evento.</p>
+            <a href="https://sites.google.com/view/15deeli/full-page-embed" target="_blank" class="bg-blue-900 text-white font-bold text-xs px-5 py-2.5 rounded-full inline-flex items-center shadow hover:bg-blue-800">
+                <i class="fa-solid fa-images mr-2"></i> Ver Álbum en Google Sites
+            </a>
+        </div>
+
+        <div class="font-script text-5xl text-blue-900 relative z-20 pb-12">Te Esperamos!</div>
+    </section>
+</div>
+
+<script>
+    const NUMERO_WHATSAPP_RECEPCION = "50373442196";
+    const BASE_INVITADOS = [
+        {"id": "1", "telefono": "50373442196", "titulo": "Elizabeth Carranza", "invitados": ["Elizabeth Carranza"], "mesa": "Mesa 1"},
+        {"id": "2", "telefono": "50378588333", "titulo": "María Caballero", "invitados": ["María Caballero"], "mesa": "Mesa 1"},
+        {"id": "3", "telefono": "50361694886", "titulo": "David López y Abuela Raymunda", "invitados": ["David López", "Abuela Raymunda Portillo"], "mesa": "Mesa 1"},
+        {"id": "4", "telefono": "50376962219", "titulo": "Iris López", "invitados": ["Iris López"], "mesa": "Mesa 1"},
+        {"id": "5", "telefono": "50370935771", "titulo": "Meylin López", "invitados": ["Meylin López"], "mesa": "Mesa 1"},
+        {"id": "6", "telefono": "50377032658", "titulo": "Vero Ramos", "invitados": ["Vero Ramos"], "mesa": "Mesa 1"},
+        {"id": "7", "telefono": "50371619502", "titulo": "Steven Mendoza", "invitados": ["Steven Mendoza"], "mesa": "Mesa 2"},
+        {"id": "8", "telefono": "50374967962", "titulo": "Dinora de Lemus y Familia", "invitados": ["Dinora de Lemus", "Federico Lemus", "Estefani Lemus", "Cristian Arana"], "mesa": "Mesa 2"},
+        {"id": "9", "telefono": "50375849105", "titulo": "Karla Arana", "invitados": ["Karla Arana"], "mesa": "Mesa 2"},
+        {"id": "10", "telefono": "50370019613", "titulo": "Carlos Carranza y Familia", "invitados": ["Carlos Carranza", "Adela Carranza", "Jenny", "Mamá de Jenny", "Fer Carranza"], "mesa": "Mesa 3"},
+        {"id": "11", "telefono": "50378939854", "titulo": "Familia Calderón Carranza", "invitados": ["Sandra Carranza", "David Calderón", "Alison Carranza", "Jeferzon Carranza"], "mesa": "Mesa 4"},
+        {"id": "12", "telefono": "50373440497", "titulo": "Familia Orellana López", "invitados": ["Sandra López", "Jorge Orellana", "Sarai Orellana", "Daniel Orellana"], "mesa": "Mesa 5"},
+        {"id": "13", "telefono": "50377607428", "titulo": "Mauda Portillo", "invitados": ["Mauda Portillo"], "mesa": "Mesa 6"},
+        {"id": "14", "telefono": "50378166578", "titulo": "Jorge Ramírez", "invitados": ["Jorge Ramírez"], "mesa": "Mesa 6"},
+        {"id": "15", "telefono": "50377703391", "titulo": "Enrrique Ramírez y Acompañante", "invitados": ["Enrrique Ramírez", "Acompañante (+1)"], "mesa": "Mesa 6"},
+        {"id": "16", "telefono": "50362083008", "titulo": "Ezequiel Ramírez y Acompañante", "invitados": ["Ezequiel Ramírez", "Acompañante (+1)"], "mesa": "Mesa 6"},
+        {"id": "17", "telefono": "50376049543", "titulo": "José Portillo y Martha de Portillo", "invitados": ["José Portillo", "Martha de Portillo"], "mesa": "Mesa 7"},
+        {"id": "18", "telefono": "50377313498", "titulo": "Jesica Portillo", "invitados": ["Jesica Portillo"], "mesa": "Mesa 7"},
+        {"id": "19", "telefono": "50375779596", "titulo": "Marjory Portillo, Pamela y Acompañante", "invitados": ["Marjory Portillo", "Acompañante (+1)", "Pamela Portillo"], "mesa": "Mesa 7"},
+        {"id": "20", "telefono": "50375496209", "titulo": "Lowell Portillo y Acompañante", "invitados": ["Lowell Portillo", "Acompañante (+1)"], "mesa": "Mesa 7"},
+        {"id": "21", "telefono": "50369789566", "titulo": "Familia Rivas Portillo", "invitados": ["Georgina Portillo", "Sergio Rivas", "Leilani Rivas"], "mesa": "Mesa 8"},
+        {"id": "22", "telefono": "50372287882", "titulo": "Cristina Corvera y Acompañante", "invitados": ["Cristina Corvera", "Acompañante (+1)"], "mesa": "Mesa 9"},
+        {"id": "23", "telefono": "50377226794", "titulo": "Carmen González y Acompañante", "invitados": ["Carmen González", "Acompañante (+1)"], "mesa": "Mesa 9"},
+        {"id": "24", "telefono": "50376709902", "titulo": "Stefani Belloso", "invitados": ["Stefani Belloso"], "mesa": "Mesa 9"},
+        {"id": "25", "telefono": "50371574798", "titulo": "Sarai Hernández y Mamá", "invitados": ["Sarai Hernández", "Mamá de Sara"], "mesa": "Mesa 10"},
+        {"id": "26", "telefono": "50378744430", "titulo": "Licda. Marlen Campos y Acompañante", "invitados": ["Licda. Marlen Campos", "Acompañante (+1)"], "mesa": "Mesa 10"},
+        {"id": "27", "telefono": "50377242485", "titulo": "Rosario", "invitados": ["Rosario"], "mesa": "Mesa 10"},
+        {"id": "28", "telefono": "50370119122", "titulo": "Alexis", "invitados": ["Alexis"], "mesa": "Mesa 10"},
+        {"id": "29", "telefono": "", "titulo": "Joselin Dayana Medina y Mamá", "invitados": ["Joselin Dayana Medina", "Mamá de Joseline"], "mesa": "Mesa 11"},
+        {"id": "30", "telefono": "50371740484", "titulo": "Reyna Ramos", "invitados": ["Reyna Ramos"], "mesa": "Mesa 11"},
+        {"id": "31", "telefono": "50375505334", "titulo": "Yesenia Rafailano, Adam Ramos y Acompañante", "invitados": ["Yesenia Rafailano", "Adam Ramos", "Acompañante (+1)"], "mesa": "Mesa 11"},
+        {"id": "32", "telefono": "50370019613", "titulo": "Arely Lemus Sanches e Hijo", "invitados": ["Arely Lemus Sanches", "Hijo de Arely"], "mesa": "Mesa 11"}
+    ];
+
+    let invitadoActual = null;
+    let toquesAdmin = 0, timerToques = null;
+
+    function toqueSecretoAdmin() {
+        toquesAdmin++;
+        clearTimeout(timerToques);
+        if (toquesAdmin >= 3) { toquesAdmin = 0; abrirAdmin(); } 
+        else { timerToques = setTimeout(() => { toquesAdmin = 0; }, 1200); }
+    }
+
+    function aplicarInvitado(datos) {
+        invitadoActual = datos;
+        document.getElementById('guest-info-container').classList.remove('hidden');
+        document.getElementById('guest-info-container').classList.add('flex');
+        document.getElementById('guest-name-display').innerText = datos.titulo;
+        document.getElementById('guest-passes-display').innerText = datos.invitados.length;
+        document.getElementById('guest-table-badge').innerText = datos.mesa;
+        
+        const rsvpForm = document.getElementById('rsvp-dynamic-form');
+        const rsvpList = document.getElementById('checkbox-list');
+        rsvpForm.classList.remove('hidden');
+        rsvpList.innerHTML = "";
+        datos.invitados.forEach((p, i) => {
+            rsvpList.innerHTML += `<label class="checkbox-label"><input type="checkbox" id="chk-${i}" value="${p}" checked class="checkbox-custom"><span>${p}</span></label>`;
+        });
+
+        document.getElementById('qr-ticket-card').classList.remove('hidden');
+        document.getElementById('qr-ticket-card').classList.add('flex');
+        document.getElementById('qr-pass-id').innerText = "Pase #" + datos.id;
+        document.getElementById('qr-table-number').innerText = datos.mesa;
+        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=172554&data=15ANOS|ID:${datos.id}|${encodeURIComponent(datos.titulo)}`;
+        
+        document.querySelectorAll('.mesa-node').forEach(el => el.classList.remove('mesa-activa'));
+        if (document.getElementById('croquis-' + datos.mesa)) {
+            document.getElementById('croquis-' + datos.mesa).classList.add('mesa-activa');
+        }
+    }
+
+    function enviarConfirmacionWhatsApp() {
+        let msj = "Hola, confirmo mi asistencia a los 15 años de Elizabeth.";
+        if (invitadoActual) {
+            let si = [], no = [];
+            document.querySelectorAll('#checkbox-list input').forEach(cb => cb.checked ? si.push(cb.value) : no.push(cb.value));
+            msj = `Hola, envío confirmación de: *${invitadoActual.titulo}* (Mesa ${invitadoActual.mesa})\n\n`;
+            if (si.length) msj += `✅ *SÍ ASISTIRÁN (${si.length}):*\n- ` + si.join('\n- ');
+            if (no.length) msj += `\n\n❌ *NO ASISTIRÁN:*\n- ` + no.join('\n- ');
+        }
+        window.open(`https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_RECEPCION}&text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    function abrirAdmin() {
+        document.getElementById('admin-modal').classList.remove('hidden');
+        document.getElementById('admin-base-url').value = window.location.origin + window.location.pathname;
+        const lista = document.getElementById('admin-guest-list');
+        lista.innerHTML = "";
+        BASE_INVITADOS.forEach((item, i) => {
+            lista.innerHTML += `
+                <div class="p-2.5 bg-gray-50 rounded-lg border flex items-center justify-between text-xs">
+                    <div><p class="font-bold">${item.titulo}</p><p class="text-gray-500">ID: ${item.id} • ${item.mesa}</p></div>
+                    <button onclick="enviarSaaS(${i})" class="bg-green-600 text-white font-bold px-3 py-1.5 rounded hover:bg-green-700">Enviar</button>
+                </div>`;
+        });
+    }
+    function cerrarAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+    function enviarSaaS(index) {
+        const item = BASE_INVITADOS[index];
+        const link = `${document.getElementById('admin-base-url').value.replace(/\/$/, "")}?id=${item.id}`;
+        const msj = `¡Hola *${item.titulo}*! ✨\nTe invitamos a los 15 Años de Elizabeth.\n\n🎟️ Pases: ${item.invitados.length}\n🪑 ${item.mesa}\n\n👉 Abre tu pase digital aquí:\n${link}`;
+        window.open(item.telefono ? `https://api.whatsapp.com/send?phone=${item.telefono}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const id = new URLSearchParams(window.location.search).get('id');
+        if (id) {
+            const guest = BASE_INVITADOS.find(g => g.id === id);
+            if (guest) aplicarInvitado(guest);
+        }
+    });
+
+    var isPlaying = false, isOpened = false, player = null;
+    function cmdYT(f, a) { const i = document.getElementById('youtube-player'); if(i && i.contentWindow) i.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}), '*'); }
+    function abrirInvitacion() {
+        if(isOpened) return; isOpened = true;
+        document.getElementById('invitation-overlay').style.opacity = '0';
+        setTimeout(() => document.getElementById('invitation-overlay').style.zIndex = '-10', 500);
+        cmdYT('unMute'); cmdYT('playVideo');
+        document.getElementById('mute-icon').className = 'fa-solid fa-volume-high animate-pulse';
+        document.getElementById('mute-text').innerText = 'Música sonando';
+        isPlaying = true;
+    }
+    function toggleMusica() { isPlaying ? cmdYT('pauseVideo') : cmdYT('playVideo'); isPlaying = !isPlaying; }
+    setInterval(() => { if (!isOpened && document.activeElement.id === 'youtube-player') abrirInvitacion(); }, 80);
+    const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+    function onYouTubeIframeAPIReady() { player = new YT.Player('youtube-player', {events: {'onStateChange': e => {if(e.data===1) abrirInvitacion();}}}); }
+
+    const countDownDate = new Date("Dec 13, 2026 10:00:00").getTime();
+    setInterval(() => {
+        const d = countDownDate - new Date().getTime();
+        if (d < 0) return;
+        document.getElementById("days").innerText = String(Math.floor(d / 86400000)).padStart(2,'0');
+        document.getElementById("hours").innerText = String(Math.floor((d % 86400000) / 3600000)).padStart(2,'0');
+        document.getElementById("minutes").innerText = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
+        document.getElementById("seconds").innerText = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
+    }, 1000);
+</script>
+</body>
+</html>
