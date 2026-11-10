@@ -3,29 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mis 15 Años - Elizabeth</title>
     
+    <!-- METADATOS PARA LA MINIATURA DE WHATSAPP -->
+    <title>Mis 15 Años - Elizabeth</title>
+    <meta property="og:title" content="Mis 15 Años - Elizabeth" />
+    <meta property="og:description" content="Tienes una nueva invitación, por favor da clic en el enlace para responder." />
+    <meta property="og:image" content="https://i.postimg.cc/mD5BkkQC/Gemini-Generated-Image-nnkz2qnnkz2qnnkz.jpg" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Tailwind CSS & Google Fonts -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root { --navy-blue: #172554; --primary-blue: #1e3a8a; }
-        body { background-color: #e5e7eb; font-family: 'Lato', sans-serif; color: var(--navy-blue); margin: 0; padding: 0; }
-        .font-script { font-family: 'Great Vibes', cursive; }
-        .mobile-container { width: 100%; max-width: 450px; margin: 0 auto; background-color: white; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; overflow-x: hidden; min-height: 100vh; }
-        .bg-section-1, .bg-section-2, .bg-section-3 { background-size: cover; background-position: center; background-repeat: no-repeat; }
-        .bg-section-1 { background-image: url('https://i.postimg.cc/mD5BkkQC/Gemini-Generated-Image-nnkz2qnnkz2qnnkz.jpg'); }
-        .bg-section-2, .bg-section-3 { background-image: url('https://i.postimg.cc/JzpkxcmL/Gemini-Generated-Image-j742sj742sj742sj.jpg'); }
-        .glass-panel { background: rgba(255, 255, 255, 0.78); backdrop-filter: blur(6px); border-radius: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-        .play-btn { background-color: var(--primary-blue); color: white; border-radius: 50%; width: 55px; height: 55px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; }
-        .play-btn:active { transform: scale(0.95); }
-        .checkbox-label { display: flex; align-items: center; color: var(--navy-blue); font-weight: 600; font-size: 0.92rem; padding: 8px 10px; border-radius: 8px; background: rgba(255,255,255,0.7); border: 1px solid rgba(30, 58, 138, 0.15); transition: background-color 0.2s; }
-        .checkbox-custom { width: 18px; height: 18px; accent-color: var(--primary-blue); margin-right: 10px; cursor: pointer; }
-        .mesa-node { width: 48px; height: 48px; border-radius: 50%; background: white; border: 2px solid #93c5fd; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: #1e3a8a; transition: all 0.3s ease; }
-        .mesa-activa { background: #1e3a8a !important; color: #ffffff !important; border-color: #fbbf24 !important; border-width: 3px !important; transform: scale(1.18); box-shadow: 0 0 15px rgba(251, 191, 36, 0.8); }
+        :root {
+            --navy-blue: #172554;
+            --primary-blue: #1e3a8a;
+        }
+
+        body {
+            background-color: #e5e7eb;
+            font-family: 'Lato', sans-serif;
+            color: var(--navy-blue);
+            margin: 0;
+            padding: 0;
+        }
+
+        .font-script {
+            font-family: 'Great Vibes', cursive;
+        }
+
+        .mobile-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- FONDOS DE SECCIONES --- */
+        .bg-section-1, .bg-section-2, .bg-section-3 {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .bg-section-1 {
+            background-image: url('https://i.postimg.cc/mD5BkkQC/Gemini-Generated-Image-nnkz2qnnkz2qnnkz.jpg');
+        }
+        .bg-section-2, .bg-section-3 {
+            background-image: url('https://i.postimg.cc/JzpkxcmL/Gemini-Generated-Image-j742sj742sj742sj.jpg');
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(6px);
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* BOTÓN DE MÚSICA FLOTANTE (SOLO ÍCONO EN ESQUINA) */
+        .floating-music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            box-shadow: 0 4px 15px rgba(23, 37, 84, 0.4);
+            z-index: 90;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .floating-music-btn:active {
+            transform: scale(0.90);
+        }
+
+        /* CHECKBOXES Y CARRUSELES */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            color: var(--navy-blue);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.75);
+            border: 1px solid rgba(30, 58, 138, 0.15);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .checkbox-custom {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-blue);
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* NODOS DEL CROQUIS DE MESAS (TONOS BLANCO Y AZUL) */
+        .mesa-node {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #93c5fd;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            transition: all 0.3s ease;
+        }
+        .mesa-activa {
+            background: #1e3a8a !important;
+            color: #ffffff !important;
+            border-color: #ffffff !important;
+            border-width: 3px !important;
+            transform: scale(1.18);
+            box-shadow: 0 0 15px rgba(30, 58, 138, 0.7);
+        }
+
         .countdown-box { display: flex; flex-direction: column; align-items: center; }
         .countdown-number { font-size: 1.8rem; font-weight: 700; color: var(--primary-blue); }
         .countdown-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; }
@@ -36,142 +153,259 @@
 
 <div class="mobile-container" id="mobile-wrap">
 
-    <!-- PANEL ADMIN SECRETO -->
+    <!-- BOTÓN DE MÚSICA FLOTANTE (SOLO ÍCONO) -->
+    <div id="floating-music-btn" onclick="toggleMusica()" class="floating-music-btn hidden" title="Música">
+        <i id="mute-icon-float" class="fa-solid fa-music text-white"></i>
+    </div>
+
+    <!-- ================= PANEL ADMIN SECRETO (8 TOQUES CONSECUTIVOS) ================= -->
     <div id="admin-modal" class="hidden fixed inset-0 bg-blue-950/90 z-[100] overflow-y-auto p-4 text-left">
         <div class="bg-white rounded-2xl max-w-md mx-auto p-5 shadow-2xl border border-blue-200">
-            <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <div class="flex justify-between items-center border-b border-blue-100 pb-3 mb-4">
                 <div>
-                    <h3 class="font-bold text-lg text-blue-900"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Panel de Envíos SaaS</h3>
-                    <p class="text-xs text-gray-500">Genera links que abren en automático</p>
+                    <h3 class="font-bold text-lg text-blue-900"><i class="fa-solid fa-sliders mr-1 text-blue-900"></i> Panel Administrador</h3>
+                    <p class="text-xs text-blue-800/70">Gestión de invitados, envíos y galería</p>
                 </div>
-                <button onclick="cerrarAdmin()" class="text-gray-400 hover:text-red-500 text-xl font-bold px-2">&times;</button>
+                <button onclick="cerrarAdmin()" class="text-blue-900 hover:text-blue-600 text-2xl font-bold px-2">&times;</button>
             </div>
+
+            <!-- URL Base de GitHub Pages -->
             <div class="mb-4 bg-blue-50 p-3 rounded-xl border border-blue-200">
-                <label class="block text-xs font-bold text-blue-900 mb-1">1. Enlace base de GitHub Pages:</label>
-                <input type="text" id="admin-base-url" class="w-full px-3 py-1.5 rounded border border-blue-300 text-xs font-mono bg-white" readonly>
+                <label class="block text-xs font-bold text-blue-900 mb-1">Enlace base de tu invitación:</label>
+                <input type="text" id="admin-base-url" class="w-full px-3 py-1.5 rounded border border-blue-300 text-xs font-mono bg-white text-blue-950" value="https://rackneloprry.github.io/15-elizabeth">
             </div>
-            <div id="admin-guest-list" class="space-y-2 max-h-96 overflow-y-auto pr-1"></div>
+
+            <!-- CREAR NUEVO INVITADO Y ENVIAR POR WHATSAPP -->
+            <div class="mb-5 bg-blue-50/50 p-3.5 rounded-xl border border-blue-200 shadow-sm">
+                <p class="text-xs font-bold text-blue-900 mb-2 uppercase"><i class="fa-solid fa-user-plus mr-1 text-blue-900"></i> Crear Nuevo Invitado:</p>
+                <input type="text" id="custom-titulo" placeholder="Nombre en Portada (Ej: Familia Pérez)" class="w-full mb-2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
+                <input type="text" id="custom-invitados" placeholder="Asistentes separados por coma (Ej: Juan Pérez, Ana de Pérez)" class="w-full mb-2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
+                <div class="flex space-x-2 mb-2.5">
+                    <input type="text" id="custom-mesa" placeholder="Mesa (Ej: Mesa 1)" class="w-1/2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none" value="Mesa 1">
+                    <input type="text" id="custom-tel" placeholder="WhatsApp (Ej: 61694886)" class="w-1/2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none">
+                </div>
+                <div class="flex space-x-2">
+                    <button onclick="enviarCustomWhatsApp()" class="w-full bg-blue-900 text-white text-xs font-bold py-2 rounded-lg hover:bg-blue-800 flex justify-center items-center">
+                        <i class="fa-brands fa-whatsapp text-green-400 text-base mr-1.5"></i> Enviar Invitación
+                    </button>
+                    <button onclick="probarCustomEnPantalla()" class="bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold px-3 py-2 rounded-lg hover:bg-blue-200" title="Previsualizar">
+                        <i class="fa-solid fa-eye text-blue-900"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- FIJAR FOTOS EN EL CARRUSEL (ADMIN) -->
+            <div class="mb-5 bg-blue-50/50 p-3.5 rounded-xl border border-blue-200 shadow-sm">
+                <p class="text-xs font-bold text-blue-900 mb-1 uppercase"><i class="fa-solid fa-thumbtack mr-1 text-blue-900"></i> Fijar Fotos en Galería (Opcional):</p>
+                <p class="text-[0.68rem] text-blue-800 mb-2">Toca una foto subida para fijarla/desfijarla en los primeros lugares del carrusel:</p>
+                <div id="admin-pin-photos" class="flex space-x-2 overflow-x-auto pb-1 hide-scrollbar">
+                    <span class="text-[0.68rem] text-blue-800 italic">Cargando fotos del Drive...</span>
+                </div>
+            </div>
+
+            <!-- LISTA OFICIAL DE INVITADOS (1 AL 32) -->
+            <p class="text-xs font-bold text-blue-900 mb-2 uppercase"><i class="fa-solid fa-users mr-1 text-blue-900"></i> Lista Oficial (IDs 1 al 32):</p>
+            <div id="admin-guest-list" class="space-y-2 max-h-72 overflow-y-auto pr-1 hide-scrollbar"></div>
         </div>
     </div>
 
-    <!-- PANTALLA DE BIENVENIDA -->
+    <!-- ================= PANTALLA DE BIENVENIDA (SOBRE VIRTUAL) ================= -->
     <div id="invitation-overlay" class="absolute top-0 left-0 w-full h-full z-50 transition-opacity duration-500 bg-white">
         <div class="sticky top-0 w-full h-screen flex flex-col items-center justify-center bg-section-1 px-4">
             <div class="glass-panel p-7 flex flex-col items-center justify-center text-center shadow-xl border border-white/60 w-full max-w-sm">
-                <!-- Toca 3 veces para Admin -->
+                
+                <!-- Toca 8 veces seguidas el título para entrar al Admin -->
                 <h2 onclick="toqueSecretoAdmin()" class="font-script text-5xl text-blue-900 mb-1 select-none cursor-pointer">Mis 15 Años</h2>
-                <p class="font-script text-4xl text-blue-800 mb-5">Elizabeth</p>
+                <p onclick="toqueSecretoAdmin()" class="font-script text-4xl text-blue-800 mb-5 select-none cursor-pointer">Elizabeth</p>
 
-                <!-- INFO AUTOMÁTICA DEL INVITADO -->
+                <!-- BIENVENIDA PERSONALIZADA AUTOMÁTICA -->
                 <div id="guest-info-container" class="hidden flex-col items-center mb-6 w-full bg-blue-950/5 border border-blue-900/20 rounded-xl p-4">
                     <p class="text-[0.65rem] uppercase tracking-widest text-blue-900 font-bold">¡Bienvenidos! Invitación especial para:</p>
                     <p id="guest-name-display" class="font-script text-3xl text-blue-900 leading-tight text-center my-1.5">Invitado Especial</p>
                     <div class="flex items-center space-x-2 mt-1">
-                        <span class="bg-blue-900 text-white text-xs font-bold px-3 py-0.5 rounded-full"><i class="fa-solid fa-ticket mr-1"></i> Pases: <span id="guest-passes-display">1</span></span>
-                        <span class="bg-amber-500 text-blue-950 text-xs font-bold px-3 py-0.5 rounded-full"><i class="fa-solid fa-chair mr-1"></i> <span id="guest-table-badge">Mesa 1</span></span>
+                        <span class="bg-blue-900 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+                            <i class="fa-solid fa-ticket mr-1 text-white"></i> Pases: <span id="guest-passes-display">1</span>
+                        </span>
+                        <span class="bg-white text-blue-900 border border-blue-300 text-xs font-bold px-3 py-0.5 rounded-full">
+                            <i class="fa-solid fa-chair mr-1 text-blue-900"></i> <span id="guest-table-badge">Mesa 1</span>
+                        </span>
                     </div>
                 </div>
                 
+                <!-- BOTÓN ABRIR INVITACIÓN -->
                 <div class="relative inline-flex items-center justify-center mt-1">
                     <button type="button" onclick="abrirInvitacion();" class="bg-blue-900 text-white px-7 py-3 rounded-full font-bold shadow-lg flex items-center space-x-2 animate-bounce cursor-pointer hover:bg-blue-800 transition">
-                        <i class="fa-regular fa-envelope-open text-xl"></i>
-                        <span class="text-sm tracking-wider uppercase">Abrir Invitación</span>
+                        <i class="fa-regular fa-envelope-open text-xl text-white"></i>
+                        <span class="text-sm tracking-wider uppercase text-white">Abrir Invitación</span>
                     </button>
-                    <!-- Bloqueador Chrome -->
+                    <!-- Reproductor invisible para desbloquear audio en móviles -->
                     <div id="yt-click-catcher" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 56px; overflow: hidden; opacity: 0.001; z-index: 60; cursor: pointer;">
                         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 200px;">
                             <iframe id="youtube-player" width="280" height="200" src="https://www.youtube.com/embed/sfYbUHWPyBw?enablejsapi=1&playsinline=1&controls=0&rel=0&loop=1&playlist=sfYbUHWPyBw" frameborder="0" allow="autoplay; encrypted-media"></iframe>
                         </div>
                     </div>
                 </div>
-                <p class="text-[0.7rem] text-blue-900 mt-3 italic opacity-80">Toca el botón para abrir y escuchar la música</p>
+                <p class="text-[0.7rem] text-blue-900 mt-3 italic opacity-80">Toca el botón para abrir tu invitación</p>
             </div>
         </div>
     </div>
 
-    <!-- SECCIÓN 1: PORTADA -->
+    <!-- ================= SECCIÓN 1: PORTADA ================= -->
     <section class="bg-section-1 min-h-screen relative flex flex-col items-center justify-between py-12 px-6">
         <div class="w-full relative mt-6 flex flex-col items-center">
-            <div class="relative flex items-center justify-center w-full">
+            <div onclick="toqueSecretoAdmin()" class="relative flex items-center justify-center w-full cursor-pointer select-none">
                 <span class="font-script text-5xl text-blue-900 absolute left-8 top-2">Mis</span>
                 <span class="font-script text-[10.5rem] leading-none text-blue-900">15</span>
             </div>
-            <div class="flex items-center justify-center -mt-6 z-10"><span class="font-script text-5xl text-blue-900">Años</span></div>
+            <div class="flex items-center justify-center -mt-6 z-10">
+                <span class="font-script text-5xl text-blue-900">Años</span>
+            </div>
             <div class="font-script text-[4.8rem] text-blue-900 text-center -mt-2 leading-tight">Elizabeth</div>
         </div>
-        <div class="mt-auto mb-6 text-center px-4 w-full z-10 relative">
-            <p class="text-[0.95rem] font-semibold text-blue-900 mb-6 italic leading-relaxed">Hace 15 años Dios me concedió<br>la vida y doy fe de su fidelidad<br>y amor, teniendo la certeza<br>que el siempre estará conmigo<br>bendiciendo de mi vida,<br>con Acción de Gracias<br>quiero celebrar mis 15 años.</p>
-            <div onclick="toggleMusica()" class="glass-panel py-3 px-6 flex flex-col items-center justify-center mx-auto w-48 shadow-sm cursor-pointer select-none relative z-20">
-                <div class="play-btn mb-2"><i id="mute-icon" class="fa-solid fa-volume-xmark"></i></div>
-                <p id="mute-text" class="font-script text-2xl text-blue-900 mt-1 leading-none">Activar música</p>
-            </div>
+
+        <div class="mt-auto mb-10 text-center px-4 w-full z-10 relative">
+            <p class="text-[0.95rem] font-semibold text-blue-900 mb-6 italic leading-relaxed">
+                Hace 15 años Dios me concedió<br>
+                la vida y doy fe de su fidelidad<br>
+                y amor, teniendo la certeza<br>
+                que el siempre estará conmigo<br>
+                bendiciendo de mi vida,<br>
+                con Acción de Gracias<br>
+                quiero celebrar mis 15 años.
+            </p>
         </div>
     </section>
 
-    <!-- SECCIÓN 2: FECHA -->
+    <!-- ================= SECCIÓN 2: FECHA Y CONTADOR ================= -->
     <section class="bg-section-2 min-h-screen relative flex flex-col items-center py-12 px-6">
         <div class="relative mt-4">
             <div class="w-56 h-72 rounded-t-full rounded-b-md overflow-hidden border-4 border-white shadow-lg relative z-10">
                 <img src="https://lh3.googleusercontent.com/d/1vCMQCZItN4-nKu0GQzKOOojfCsNL1E5r" alt="Elizabeth" class="w-full h-full object-cover">
             </div>
+            <img src="https://i.postimg.cc/5ypCrwv8/15-anos-Eli-(1440-x-3088-px)-(4).png" alt="Mariposa azul" class="absolute -top-4 -right-6 w-16 h-16 object-contain z-20 drop-shadow-md">
         </div>
-        <p class="text-center text-[0.95rem] font-semibold text-blue-900 italic mb-5 mt-6 leading-relaxed">Es mi deseo y el de mi familia<br>que compartan conmigo<br>este día tan especial.</p>
+        
+        <img src="https://i.postimg.cc/XYPw3chV/15-anos-Eli-(1440-x-3088-px)-(3).png" alt="Divisor floral" class="w-64 h-auto object-contain mt-3 mb-4 z-20">
+
+        <p class="text-center text-[0.95rem] font-semibold text-blue-900 italic mb-5 leading-relaxed">
+            Es mi deseo y el de mi familia<br>
+            que compartan conmigo<br>
+            este día tan especial.
+        </p>
+
         <p class="text-xs font-bold text-blue-900 uppercase tracking-widest mb-1">Reserva la fecha:</p>
+        
         <div class="flex items-end justify-center w-full">
             <span class="font-script text-4xl text-blue-900 mb-3">Domingo</span>
             <span class="font-script text-[6.5rem] leading-none text-blue-900 mx-3">13</span>
             <span class="font-script text-4xl text-blue-900 mb-3">Diciembre</span>
         </div>
+        
         <div class="flex items-center justify-center -mt-2 mb-2 w-full">
+            <img src="https://i.postimg.cc/KzB70kJV/15-anos-Eli-(1440-x-3088-px)-(1).png" alt="Adorno izquierdo" class="w-20 h-auto object-contain">
             <span class="text-xl text-blue-900 font-bold italic mx-2">2026</span>
+            <img src="https://i.postimg.cc/kXnNy58y/15-anos-Eli-(1440-x-3088-px)-(2).png" alt="Adorno derecho" class="w-20 h-auto object-contain">
         </div>
+        
         <p class="text-sm font-bold text-blue-900 mt-1">Hora: 10:00am</p>
+
         <div class="glass-panel w-full mt-6 p-4 flex justify-around items-start">
-            <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Días</span></div><span class="countdown-separator">:</span>
-            <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Horas</span></div><span class="countdown-separator">:</span>
-            <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutos</span></div><span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Días</span></div>
+            <span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Horas</span></div>
+            <span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutos</span></div>
+            <span class="countdown-separator">:</span>
             <div class="countdown-box"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Segundos</span></div>
         </div>
     </section>
 
-    <!-- SECCIÓN 3: RSVP Y GALERÍA -->
+    <!-- ================= SECCIÓN 3: RECEPCIÓN, CONFIRMACIÓN, QR Y ÁLBUM EN VIVO ================= -->
     <section class="bg-section-3 min-h-screen relative flex flex-col items-center py-12 px-5 overflow-hidden">
+        
+        <img src="https://i.postimg.cc/k5cRGQ1k/15-anos-Eli-(Sitio-web)-(3).png" alt="Palmera" class="absolute -top-2 -right-4 w-32 h-auto object-contain z-0 opacity-90 pointer-events-none">
+        <img src="https://i.postimg.cc/vHJVNH6R/15-anos-Eli-(Sitio-web)-(4).png" alt="Flor de hibisco" class="absolute top-4 -left-6 w-28 h-auto object-contain z-0 opacity-90 pointer-events-none rotate-[-15deg]">
+
+        <!-- UBICACIÓN (ICONOS EN AZUL Y BLANCO) -->
         <div class="text-center mb-6 mt-2 relative z-10">
             <h3 class="font-script text-5xl text-blue-900 mb-2">Recepción:</h3>
             <div class="flex items-center justify-center text-blue-900 mb-1">
-                <i class="fa-solid fa-location-dot text-2xl mr-3"></i>
+                <i class="fa-solid fa-location-dot text-2xl mr-3 text-blue-900"></i>
                 <p class="text-[0.95rem] font-semibold italic leading-tight">Rancho La Sagrada Familia,<br>Playa San Diego.</p>
             </div>
+            
             <div class="flex items-center justify-center space-x-3 mt-4">
-                <a href="https://maps.app.goo.gl/kvcyPASZp8dUfoW48" target="_blank" class="bg-white border border-blue-200 text-blue-900 px-4 py-2 rounded-full font-bold text-xs"><i class="fa-solid fa-map-location-dot text-green-600 mr-2"></i> Maps</a>
-                <a href="https://waze.com/ul?q=Rancho+La+Sagrada+Familia,+Playa+San+Diego" target="_blank" class="bg-white border border-blue-200 text-blue-900 px-4 py-2 rounded-full font-bold text-xs"><i class="fa-brands fa-waze text-blue-500 mr-2"></i> Waze</a>
+                <a href="https://maps.app.goo.gl/kvcyPASZp8dUfoW48?g_st=ac" target="_blank" class="bg-blue-900 text-white border border-white/40 px-4 py-2 rounded-full font-bold text-xs flex items-center shadow-sm transition hover:bg-blue-800">
+                    <i class="fa-solid fa-map-location-dot text-white mr-2 text-base"></i> Maps
+                </a>
+                <a href="https://waze.com/ul?q=Rancho+La+Sagrada+Familia,+Playa+San+Diego" target="_blank" class="bg-white border border-blue-300 text-blue-900 px-4 py-2 rounded-full font-bold text-xs flex items-center shadow-sm transition hover:bg-blue-50">
+                    <i class="fa-brands fa-waze text-blue-900 mr-2 text-base"></i> Waze
+                </a>
             </div>
         </div>
 
-        <!-- TARJETA RSVP -->
-        <div class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
-            <h3 class="font-script text-4xl text-blue-900 mb-2">Confirmación</h3>
-            <div id="rsvp-dynamic-form" class="text-left w-full mb-5 hidden">
-                <p class="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide"><i class="fa-regular fa-square-check mr-1"></i> Confirma quiénes asistirán:</p>
-                <div id="checkbox-list" class="flex flex-col space-y-2"></div>
+        <!-- VESTIMENTA -->
+        <div class="text-center mb-6 w-full relative z-10">
+            <div class="flex items-center justify-center space-x-4 mb-2">
+                <i class="fa-solid fa-shirt text-2xl text-blue-900"></i>
+                <h3 class="font-script text-4xl text-blue-900">Código de Vestimenta:</h3>
+                <i class="fa-solid fa-person-dress text-2xl text-blue-900"></i>
             </div>
-            <button onclick="enviarConfirmacionWhatsApp()" class="w-full bg-green-600 text-white font-bold text-sm px-6 py-3 rounded-full flex justify-center items-center shadow-md">
-                <i class="fa-brands fa-whatsapp text-xl mr-2"></i> Confirmar por WhatsApp
+            <p class="text-[0.95rem] font-bold text-blue-900 italic">Casual de Playa en blanco.</p>
+            <p class="text-xs text-blue-900 mt-1 font-semibold italic">Nota: se reserva color AZUL para Quinceañera.</p>
+        </div>
+
+        <!-- ================= SECCIÓN DE CONFIRMACIÓN (ANTES DEL 30) ================= -->
+        <div class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Confirmar Asistencia</h3>
+            <p class="text-xs font-bold text-blue-900 mb-3 bg-white/90 py-1.5 px-4 rounded-full inline-block border border-blue-200 shadow-sm">
+                <i class="fa-regular fa-calendar-check mr-1 text-blue-900"></i> Por favor confirmar antes del 30 de Noviembre
+            </p>
+
+            <!-- Cabecera del Grupo -->
+            <div id="rsvp-guest-header" class="hidden mb-3 bg-blue-900 text-white py-2 px-4 rounded-xl shadow-sm">
+                <p class="text-[0.65rem] uppercase tracking-widest opacity-80">Invitación asignada a:</p>
+                <p id="rsvp-guest-title" class="font-bold text-sm"></p>
+            </div>
+
+            <!-- Casillas Dinámicas (Al marcar/desmarcar se regeneran los QRs en vivo) -->
+            <div id="rsvp-dynamic-form" class="text-left w-full mb-5 hidden">
+                <p class="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide">
+                    <i class="fa-regular fa-square-check mr-1 text-blue-900"></i> Selecciona quiénes asistirán:
+                </p>
+                <div id="checkbox-list" class="flex flex-col space-y-2" onchange="generarQRs()"></div>
+            </div>
+
+            <!-- Botón de Confirmación (Botón azul/blanco, solo el ícono de WhatsApp en verde) -->
+            <button type="button" onclick="enviarConfirmacionWhatsApp()" class="w-full bg-blue-900 text-white font-bold text-sm px-6 py-3 rounded-full inline-flex items-center justify-center shadow-md hover:bg-blue-800 transition cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-green-400 text-2xl mr-2"></i> Confirmar por WhatsApp
             </button>
         </div>
 
-        <!-- PASE Y CROQUIS -->
+        <!-- ================= CARRUSEL DE PASES QR Y CROQUIS DE MESAS ================= -->
         <div id="pass-qr-section" class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
-            <h3 class="font-script text-4xl text-blue-900 mb-2">Tu Pase y Mesa</h3>
-            <div id="qr-ticket-card" class="hidden flex-col items-center bg-white p-4 rounded-xl shadow-inner border border-blue-200 mb-4">
-                <span id="qr-pass-id" class="text-[0.65rem] uppercase tracking-widest text-blue-800 font-bold">Pase Oficial</span>
-                <img id="qr-image" src="" alt="QR" class="w-36 h-36 border-4 border-blue-900 rounded-lg p-1 my-2">
-                <div class="flex items-center space-x-3 text-xs font-bold text-blue-900">
-                    <span id="qr-table-number" class="bg-amber-100 text-amber-900 px-3 py-1 rounded-full">Mesa</span>
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Tus Pases QR y Mesa</h3>
+            <p id="qr-swipe-hint" class="text-[0.68rem] text-blue-900 mb-3 font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-arrows-left-right mr-1 text-blue-900"></i> Desliza de derecha a izquierda para ver cada QR
+            </p>
+
+            <!-- Contenedor Deslizable de QRs (1 QR por asistente confirmado) -->
+            <div class="relative w-full mb-3">
+                <div id="qr-carousel" class="flex overflow-x-auto snap-x snap-mandatory space-x-3 pb-2 w-full hide-scrollbar scroll-smooth">
+                    <!-- Se genera automáticamente un QR por cada asistente confirmado -->
                 </div>
+                <!-- Puntos indicadores del carrusel QR -->
+                <div id="qr-dots" class="flex justify-center space-x-1.5 mt-2"></div>
             </div>
-            <div class="bg-blue-950/5 rounded-xl p-3 border border-blue-900/15">
-                <p class="text-[0.7rem] font-bold text-white bg-blue-900 py-1.5 rounded mb-3">MESA PRINCIPAL (ELIZABETH)</p>
+
+            <!-- CROQUIS DE MESAS -->
+            <div class="bg-blue-950/5 rounded-xl p-3 border border-blue-900/15 mt-3">
+                <p class="text-xs font-bold text-blue-900 uppercase tracking-wider mb-1">
+                    <i class="fa-solid fa-chair mr-1 text-blue-900"></i> Ubicación: <span id="croquis-assigned-label" class="underline">Mesa Asignada</span>
+                </p>
+                <div class="w-full bg-blue-900 text-white text-[0.7rem] font-bold py-1.5 rounded-lg mb-3 shadow-sm">
+                    MESA PRINCIPAL (ELIZABETH) Y PISTA DE BAILE
+                </div>
                 <div class="grid grid-cols-4 gap-2.5 justify-items-center my-2 px-1">
                     <div id="croquis-Mesa 1" class="mesa-node"><span>Mesa</span><span class="text-xs">1</span></div>
                     <div id="croquis-Mesa 2" class="mesa-node"><span>Mesa</span><span class="text-xs">2</span></div>
@@ -184,26 +418,78 @@
                     <div id="croquis-Mesa 9" class="mesa-node"><span>Mesa</span><span class="text-xs">9</span></div>
                     <div id="croquis-Mesa 10" class="mesa-node"><span>Mesa</span><span class="text-xs">10</span></div>
                     <div id="croquis-Mesa 11" class="mesa-node"><span>Mesa</span><span class="text-xs">11</span></div>
+                    <div class="flex flex-col items-center justify-center text-[0.6rem] font-bold text-blue-900">
+                        <i class="fa-solid fa-water text-base text-blue-900 mb-0.5"></i>
+                        <span>Playa</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- GALERÍA HÍBRIDA EN GOOGLE SITES -->
-        <div class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+        <!-- ================= SECCIÓN 4: GALERÍA DE 6 FOTOS EN VIVO (REEL DE SLIDES) ================= -->
+        <div id="galeria-en-vivo" class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
             <i class="fa-solid fa-camera-retro text-3xl text-blue-900 mb-1"></i>
-            <h3 class="font-script text-4xl text-blue-900 mb-1">Galería de Fotos</h3>
-            <p class="text-xs text-blue-900 mb-4">Visita nuestro sitio oficial para ver y subir fotos del evento.</p>
-            <a href="https://sites.google.com/view/15deeli/full-page-embed" target="_blank" class="bg-blue-900 text-white font-bold text-xs px-5 py-2.5 rounded-full inline-flex items-center shadow hover:bg-blue-800">
-                <i class="fa-solid fa-images mr-2"></i> Ver Álbum en Google Sites
-            </a>
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Álbum en Vivo</h3>
+            <p class="text-xs text-blue-900 mb-3 font-semibold leading-relaxed">
+                ¡Comparte tus fotos de la celebración! Las últimas 6 fotos aparecen en este reel en tiempo real.
+            </p>
+            
+            <!-- Reel Deslizable de 6 Fotos -->
+            <div class="relative w-full">
+                <div id="gallery-container" class="flex overflow-x-auto snap-x snap-mandatory space-x-3 pb-3 mb-2 w-full hide-scrollbar scroll-smooth min-h-[16rem] items-center">
+                    <p class="text-xs text-blue-900 w-full animate-pulse my-10">
+                        Cargando galería en vivo... <i class="fa-solid fa-spinner fa-spin ml-1 text-blue-900"></i>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botones para Subir Foto al Drive y Ver Galería -->
+            <div class="flex flex-col space-y-2.5 mt-2">
+                <input type="file" id="foto-upload" accept="image/*" class="hidden" onchange="subirFotoDrive()">
+                <label for="foto-upload" class="bg-blue-900 text-white font-bold text-xs px-5 py-3 rounded-full inline-flex items-center justify-center shadow-md hover:bg-blue-800 transition cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-white text-base"></i> Tomar / Subir una Foto al Álbum
+                </label>
+                <a href="https://sites.google.com/view/15deeli/full-page-embed" target="_blank" class="bg-white text-blue-900 border border-blue-300 font-bold text-xs px-5 py-2.5 rounded-full inline-flex items-center justify-center shadow-sm hover:bg-blue-50 transition">
+                    <i class="fa-regular fa-images mr-2 text-blue-900"></i> Ver Álbum Completo
+                </a>
+            </div>
+            <p id="upload-status" class="text-xs font-bold mt-3 hidden transition-all"></p>
         </div>
 
-        <div class="font-script text-5xl text-blue-900 relative z-20 pb-12">Te Esperamos!</div>
+        <!-- FOTO CIRCULAR Y CIERRE -->
+        <div class="relative my-4 flex justify-center items-center w-64 h-64 mx-auto z-10">
+            <div class="w-44 h-44 rounded-full overflow-hidden shadow-md relative z-10">
+                <img src="https://lh3.googleusercontent.com/d/1M5UZHbMauuSwvckpp_kEq9Y6Ty_WIU0K" alt="Elizabeth" class="w-full h-full object-cover">
+            </div>
+            <img src="https://i.postimg.cc/3wpDhMm4/15-anos-Eli-(1440-x-3088-px)-(5).png" alt="Corona de flores" class="absolute inset-0 w-full h-full object-contain z-20 scale-110 pointer-events-none">
+        </div>
+
+        <div class="relative w-full mt-4 pt-2 pb-6 flex flex-col items-center z-10">
+            <img src="https://i.postimg.cc/mrN2VT7w/15-anos-Eli-(1440-x-3088-px)-(7).png" alt="Caracol marino" class="absolute -left-6 bottom-6 w-20 h-20 object-contain z-10 opacity-90">
+            <img src="https://i.postimg.cc/c4rCZyNH/15-anos-Eli-(1440-x-3088-px)-(6).png" alt="Concha marina" class="absolute left-4 -bottom-2 w-16 h-16 object-contain z-10 opacity-90">
+            <img src="https://i.postimg.cc/VLxf8JRC/15-anos-Eli-(1440-x-3088-px)-(8).png" alt="Estrella de mar azul" class="absolute left-12 bottom-6 w-14 h-14 object-contain z-10 opacity-85">
+
+            <div class="flex items-center justify-center space-x-3 mb-6 relative z-20 px-4">
+                <i class="fa-regular fa-envelope text-3xl text-blue-900"></i>
+                <p class="text-sm font-semibold text-blue-900 italic leading-tight">
+                    Apreciaré sus muestras de<br>cariño en regalo de sobre.
+                </p>
+            </div>
+
+            <div class="font-script text-5xl text-blue-900 relative z-20">Te Esperamos!</div>
+        </div>
     </section>
+
 </div>
 
 <script>
+    // =========================================================================
+    // CONFIGURACIÓN PRINCIPAL Y LINK DE TU GOOGLE APPS SCRIPT
+    // =========================================================================
     const NUMERO_WHATSAPP_RECEPCION = "50373442196";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwu5CM81cFCHa3uAz8gLBC1DHdNBGQ9o0c405qdr_DZzM4EL_7iM-vL9bzuirlV6xHscw/exec";
+
+    // BASE DE DATOS DE INVITADOS (ID 1 AL 32)
     const BASE_INVITADOS = [
         {"id": "1", "telefono": "50373442196", "titulo": "Elizabeth Carranza", "invitados": ["Elizabeth Carranza"], "mesa": "Mesa 1"},
         {"id": "2", "telefono": "50378588333", "titulo": "María Caballero", "invitados": ["María Caballero"], "mesa": "Mesa 1"},
@@ -241,40 +527,101 @@
 
     let invitadoActual = null;
     let toquesAdmin = 0, timerToques = null;
+    let fotosRecibidasDrive = [];
 
+    // =========================================================================
+    // ACCESO SECRETO AL PANEL ADMIN (8 TOQUES CONSECUTIVOS)
+    // =========================================================================
     function toqueSecretoAdmin() {
         toquesAdmin++;
         clearTimeout(timerToques);
-        if (toquesAdmin >= 3) { toquesAdmin = 0; abrirAdmin(); } 
-        else { timerToques = setTimeout(() => { toquesAdmin = 0; }, 1200); }
+        if (toquesAdmin >= 8) {
+            toquesAdmin = 0;
+            abrirAdmin();
+        } else {
+            timerToques = setTimeout(() => { toquesAdmin = 0; }, 1800);
+        }
     }
 
+    // =========================================================================
+    // PERSONALIZACIÓN DE INVITADO Y CARRUSEL DE QRs POR ASISTENTE
+    // =========================================================================
     function aplicarInvitado(datos) {
         invitadoActual = datos;
-        document.getElementById('guest-info-container').classList.remove('hidden');
-        document.getElementById('guest-info-container').classList.add('flex');
+
+        // 1. Mostrar en el Sobre Virtual
+        const infoContainer = document.getElementById('guest-info-container');
+        infoContainer.classList.remove('hidden');
+        infoContainer.classList.add('flex');
         document.getElementById('guest-name-display').innerText = datos.titulo;
         document.getElementById('guest-passes-display').innerText = datos.invitados.length;
         document.getElementById('guest-table-badge').innerText = datos.mesa;
-        
+
+        // 2. Mostrar cabecera y casillas de confirmación
+        document.getElementById('rsvp-guest-header').classList.remove('hidden');
+        document.getElementById('rsvp-guest-title').innerText = `${datos.titulo} (${datos.mesa})`;
+
         const rsvpForm = document.getElementById('rsvp-dynamic-form');
         const rsvpList = document.getElementById('checkbox-list');
         rsvpForm.classList.remove('hidden');
         rsvpList.innerHTML = "";
-        datos.invitados.forEach((p, i) => {
-            rsvpList.innerHTML += `<label class="checkbox-label"><input type="checkbox" id="chk-${i}" value="${p}" checked class="checkbox-custom"><span>${p}</span></label>`;
+
+        datos.invitados.forEach((persona, idx) => {
+            rsvpList.innerHTML += `
+                <label class="checkbox-label">
+                    <input type="checkbox" id="chk-${idx}" value="${persona}" checked class="checkbox-custom">
+                    <span>${persona}</span>
+                </label>`;
         });
 
-        document.getElementById('qr-ticket-card').classList.remove('hidden');
-        document.getElementById('qr-ticket-card').classList.add('flex');
-        document.getElementById('qr-pass-id').innerText = "Pase #" + datos.id;
-        document.getElementById('qr-table-number').innerText = datos.mesa;
-        document.getElementById('qr-image').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&color=172554&data=15ANOS|ID:${datos.id}|${encodeURIComponent(datos.titulo)}`;
-        
+        // 3. Resaltar mesa en el croquis
+        document.getElementById('croquis-assigned-label').innerText = datos.mesa;
         document.querySelectorAll('.mesa-node').forEach(el => el.classList.remove('mesa-activa'));
-        if (document.getElementById('croquis-' + datos.mesa)) {
-            document.getElementById('croquis-' + datos.mesa).classList.add('mesa-activa');
+        const nodoMesa = document.getElementById('croquis-' + datos.mesa);
+        if (nodoMesa) nodoMesa.classList.add('mesa-activa');
+
+        // 4. Generar un código QR por cada asistente marcado
+        generarQRs();
+    }
+
+    function generarQRs() {
+        const qrContainer = document.getElementById('qr-carousel');
+        const qrDots = document.getElementById('qr-dots');
+        qrContainer.innerHTML = "";
+        qrDots.innerHTML = "";
+
+        if (!invitadoActual) {
+            qrContainer.innerHTML = '<p class="text-xs text-blue-900 mx-auto py-6 italic">Abre tu enlace personalizado para visualizar tus códigos QR.</p>';
+            return;
         }
+
+        const marcados = Array.from(document.querySelectorAll('#checkbox-list input:checked')).map(cb => cb.value);
+
+        if (marcados.length === 0) {
+            qrContainer.innerHTML = '<p class="text-xs font-bold text-blue-900 mx-auto py-6">Selecciona al menos 1 asistente en la lista de arriba para generar su QR.</p>';
+            return;
+        }
+
+        marcados.forEach((nombreAsistente, index) => {
+            const numPase = index + 1;
+            const total = marcados.length;
+            const textoQR = `15 ANOS ELIZABETH | PASE ${numPase}/${total} | ASISTENTE: ${nombreAsistente} | GRUPO: ${invitadoActual.titulo} | ${invitadoActual.mesa}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=172554&data=${encodeURIComponent(textoQR)}`;
+
+            qrContainer.innerHTML += `
+                <div class="min-w-full flex-shrink-0 flex flex-col items-center justify-center snap-center bg-white p-4 rounded-xl border border-blue-200 shadow-inner">
+                    <div class="flex items-center justify-between w-full mb-1 px-2">
+                        <span class="text-[0.65rem] uppercase tracking-widest text-blue-900 font-bold">Pase Individual ${numPase} de ${total}</span>
+                        <span class="text-[0.65rem] font-bold bg-blue-900 text-white px-2.5 py-0.5 rounded-full">${invitadoActual.mesa}</span>
+                    </div>
+                    <p class="font-bold text-blue-950 text-base my-1 text-center">${nombreAsistente}</p>
+                    <img src="${qrUrl}" alt="QR ${nombreAsistente}" class="w-36 h-36 border-4 border-blue-900 rounded-lg p-1 my-1">
+                    <p class="text-[0.65rem] text-blue-800 mt-1">Desliza para ver el siguiente pase <i class="fa-solid fa-arrow-right ml-1 text-blue-900"></i></p>
+                </div>
+            `;
+
+            qrDots.innerHTML += `<span class="w-2 h-2 rounded-full ${index === 0 ? 'bg-blue-900' : 'bg-blue-300'}"></span>`;
+        });
     }
 
     function enviarConfirmacionWhatsApp() {
@@ -282,68 +629,326 @@
         if (invitadoActual) {
             let si = [], no = [];
             document.querySelectorAll('#checkbox-list input').forEach(cb => cb.checked ? si.push(cb.value) : no.push(cb.value));
-            msj = `Hola, envío confirmación de: *${invitadoActual.titulo}* (Mesa ${invitadoActual.mesa})\n\n`;
-            if (si.length) msj += `✅ *SÍ ASISTIRÁN (${si.length}):*\n- ` + si.join('\n- ');
-            if (no.length) msj += `\n\n❌ *NO ASISTIRÁN:*\n- ` + no.join('\n- ');
+
+            msj = `Hola, envío confirmación de asistencia para los 15 de Elizabeth:\n*${invitadoActual.titulo}* (${invitadoActual.mesa})\n\n`;
+            if (si.length) msj += `\u2705 *SÍ ASISTIRÁN (${si.length} QR generados):*\n- ` + si.join('\n- ');
+            if (no.length) msj += `\n\n\u274C *NO PODRÁN ASISTIR:*\n- ` + no.join('\n- ');
         }
         window.open(`https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_RECEPCION}&text=${encodeURIComponent(msj)}`, '_blank');
     }
 
+    // =========================================================================
+    // FUNCIONES DEL PANEL ADMIN Y ENVÍO DE INVITACIONES POR WHATSAPP
+    // =========================================================================
     function abrirAdmin() {
         document.getElementById('admin-modal').classList.remove('hidden');
-        document.getElementById('admin-base-url').value = window.location.origin + window.location.pathname;
+        const baseInput = document.getElementById('admin-base-url');
+        if (!window.location.hostname.includes("googleusercontent.com")) {
+            baseInput.value = window.location.origin + window.location.pathname;
+        }
         const lista = document.getElementById('admin-guest-list');
         lista.innerHTML = "";
         BASE_INVITADOS.forEach((item, i) => {
             lista.innerHTML += `
-                <div class="p-2.5 bg-gray-50 rounded-lg border flex items-center justify-between text-xs">
-                    <div><p class="font-bold">${item.titulo}</p><p class="text-gray-500">ID: ${item.id} • ${item.mesa}</p></div>
-                    <button onclick="enviarSaaS(${i})" class="bg-green-600 text-white font-bold px-3 py-1.5 rounded hover:bg-green-700">Enviar</button>
+                <div class="p-2.5 bg-white rounded-lg border border-blue-200 flex items-center justify-between text-xs shadow-sm">
+                    <div class="pr-2">
+                        <p class="font-bold text-blue-950">${item.id}. ${item.titulo}</p>
+                        <p class="text-[0.68rem] text-blue-800">${item.invitados.length} pase(s) • ${item.mesa}</p>
+                    </div>
+                    <div class="flex space-x-1 shrink-0">
+                        <button onclick="previsualizarInvitado(${i})" class="bg-blue-50 text-blue-900 border border-blue-200 font-bold px-2.5 py-1.5 rounded hover:bg-blue-100" title="Ver">
+                            <i class="fa-solid fa-eye text-blue-900"></i>
+                        </button>
+                        <button onclick="enviarSaaS(${i})" class="bg-blue-900 text-white font-bold px-3 py-1.5 rounded hover:bg-blue-800 flex items-center">
+                            <i class="fa-brands fa-whatsapp text-green-400 mr-1 text-sm"></i> Enviar
+                        </button>
+                    </div>
                 </div>`;
         });
+        renderizarAdminFotosFijadas();
     }
-    function cerrarAdmin() { document.getElementById('admin-modal').classList.add('hidden'); }
+
+    function cerrarAdmin() {
+        document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function previsualizarInvitado(index) {
+        aplicarInvitado(BASE_INVITADOS[index]);
+        cerrarAdmin();
+    }
 
     function enviarSaaS(index) {
         const item = BASE_INVITADOS[index];
-        const link = `${document.getElementById('admin-base-url').value.replace(/\/$/, "")}?id=${item.id}`;
-        const msj = `¡Hola *${item.titulo}*! ✨\nTe invitamos a los 15 Años de Elizabeth.\n\n🎟️ Pases: ${item.invitados.length}\n🪑 ${item.mesa}\n\n👉 Abre tu pase digital aquí:\n${link}`;
+        const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
+        const link = `${baseUrl}?id=${item.id}`;
+        const msj = `¡Hola *${item.titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${link}`;
         window.open(item.telefono ? `https://api.whatsapp.com/send?phone=${item.telefono}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        const id = new URLSearchParams(window.location.search).get('id');
-        if (id) {
-            const guest = BASE_INVITADOS.find(g => g.id === id);
-            if (guest) aplicarInvitado(guest);
+    function construirCustomObj() {
+        const titulo = document.getElementById('custom-titulo').value.trim() || "Invitado Especial";
+        const invStr = document.getElementById('custom-invitados').value.trim() || titulo;
+        const mesa = document.getElementById('custom-mesa').value.trim() || "Mesa 1";
+        return {
+            id: "",
+            titulo: titulo,
+            invitados: invStr.split(',').map(s => s.trim()).filter(Boolean),
+            mesa: mesa
+        };
+    }
+
+    function probarCustomEnPantalla() {
+        aplicarInvitado(construirCustomObj());
+        cerrarAdmin();
+    }
+
+    function enviarCustomWhatsApp() {
+        const titulo = document.getElementById('custom-titulo').value.trim();
+        const invStr = document.getElementById('custom-invitados').value.trim();
+        const mesa = document.getElementById('custom-mesa').value.trim() || "Mesa 1";
+
+        if (!titulo || !invStr) {
+            alert("Por favor escribe el Nombre en Portada y los Asistentes.");
+            return;
         }
+
+        let tel = document.getElementById('custom-tel').value.replace(/\D/g, '');
+        if (tel.length === 8) tel = "503" + tel;
+
+        const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
+        const linkPersonalizado = `${baseUrl}?titulo=${encodeURIComponent(titulo)}&invitados=${encodeURIComponent(invStr)}&mesa=${encodeURIComponent(mesa)}`;
+        const msj = `¡Hola *${titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${linkPersonalizado}`;
+
+        window.open(tel ? `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    // =========================================================================
+    // GALERÍA EN VIVO CONECTADA A TU GOOGLE APPS SCRIPT (6 SLIDES + FIJADAS)
+    // =========================================================================
+    function optimizarUrlDrive(url) {
+        const match = String(url).match(/[?&]id=([^&]+)/);
+        if (match && match[1]) {
+            return `https://lh3.googleusercontent.com/d/${match[1]}`;
+        }
+        return url;
+    }
+
+    function obtenerFotosFijadas() {
+        try {
+            return JSON.parse(localStorage.getItem('eli_pinned_photos') || "[]");
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function alternarFotoFijada(url) {
+        let fijadas = obtenerFotosFijadas();
+        if (fijadas.includes(url)) {
+            fijadas = fijadas.filter(u => u !== url);
+        } else if (fijadas.length < 6) {
+            fijadas.push(url);
+        }
+        localStorage.setItem('eli_pinned_photos', JSON.stringify(fijadas));
+        mostrarFotosEnReel();
+        renderizarAdminFotosFijadas();
+    }
+
+    function renderizarAdminFotosFijadas() {
+        const box = document.getElementById('admin-pin-photos');
+        if (!box) return;
+        if (fotosRecibidasDrive.length === 0) {
+            box.innerHTML = '<span class="text-[0.68rem] text-blue-800 italic">Aún no hay fotos en la carpeta de Drive.</span>';
+            return;
+        }
+        const fijadas = obtenerFotosFijadas();
+        box.innerHTML = "";
+        fotosRecibidasDrive.forEach(url => {
+            const esFija = fijadas.includes(url);
+            box.innerHTML += `
+                <div onclick="alternarFotoFijada('${url}')" class="relative flex-shrink-0 cursor-pointer">
+                    <img src="${url}" class="w-14 h-16 object-cover rounded-lg border-2 ${esFija ? 'border-blue-900' : 'border-transparent opacity-70'}">
+                    <span class="absolute top-0.5 right-0.5 bg-blue-900 text-white text-[0.55rem] px-1 rounded">${esFija ? '📌' : ''}</span>
+                </div>`;
+        });
+    }
+
+    function mostrarFotosEnReel() {
+        const container = document.getElementById('gallery-container');
+        const fijadas = obtenerFotosFijadas();
+        const noFijadas = fotosRecibidasDrive.filter(u => !fijadas.includes(u));
+        const listaFinal = [...fijadas, ...noFijadas].slice(0, 6);
+
+        container.innerHTML = "";
+        if (listaFinal.length === 0) {
+            container.innerHTML = '<p class="text-xs text-blue-900 w-full my-10 font-semibold">Aún no hay fotos en el álbum. ¡Sé el primero en compartir una!</p>';
+            return;
+        }
+
+        listaFinal.forEach((url, i) => {
+            const esFija = fijadas.includes(url);
+            container.innerHTML += `
+                <div class="relative w-52 h-64 flex-shrink-0 snap-center">
+                    <img src="${url}" alt="Foto ${i + 1}" class="w-full h-full object-cover rounded-xl border-2 border-white shadow-md">
+                    ${esFija ? '<span class="absolute top-2 right-2 bg-blue-900 text-white text-[0.6rem] font-bold px-2 py-0.5 rounded-full shadow"><i class="fa-solid fa-thumbtack mr-1 text-white"></i>Destacada</span>' : ''}
+                </div>`;
+        });
+    }
+
+    async function cargarGaleria() {
+        const container = document.getElementById('gallery-container');
+        try {
+            const response = await fetch(SCRIPT_URL);
+            const urls = await response.json();
+            fotosRecibidasDrive = (Array.isArray(urls) ? urls : []).map(optimizarUrlDrive);
+            mostrarFotosEnReel();
+        } catch (e) {
+            container.innerHTML = '<p class="text-xs text-blue-900 w-full my-10">Sube la primera foto para inaugurar el álbum en vivo.</p>';
+        }
+    }
+
+    function subirFotoDrive() {
+        const input = document.getElementById('foto-upload');
+        if (!input.files[0]) return;
+
+        const file = input.files[0];
+        const status = document.getElementById('upload-status');
+
+        status.innerText = "Subiendo tu foto al álbum... ⏳";
+        status.className = "text-xs font-bold mt-3 text-blue-900 block";
+
+        const reader = new FileReader();
+        reader.onload = async function() {
+            const base64 = reader.result.split(',')[1];
+            const payload = {
+                fileName: file.name,
+                mimeType: file.type,
+                base64: base64
+            };
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload),
+                    headers: { "Content-Type": "text/plain;charset=utf-8" }
+                });
+
+                status.innerText = "¡Foto subida con éxito! Actualizando galería...";
+                status.className = "text-xs font-bold mt-3 text-blue-900 block";
+                input.value = "";
+
+                setTimeout(() => {
+                    cargarGaleria();
+                    status.classList.add('hidden');
+                }, 2500);
+            } catch (e) {
+                status.innerText = "No se pudo subir la foto. Intenta nuevamente.";
+                status.className = "text-xs font-bold mt-3 text-blue-900 block";
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // =========================================================================
+    // INICIALIZACIÓN AL CARGAR LA PÁGINA
+    // =========================================================================
+    document.addEventListener("DOMContentLoaded", () => {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // 1. Si el enlace viene creado desde "Crear Nuevo Invitado" en el Admin
+        const paramTitulo = urlParams.get('titulo');
+        if (paramTitulo) {
+            aplicarInvitado({
+                id: "",
+                titulo: paramTitulo,
+                invitados: (urlParams.get('invitados') || paramTitulo).split(',').map(s => s.trim()).filter(Boolean),
+                mesa: urlParams.get('mesa') || "Mesa 1"
+            });
+        } else {
+            // 2. Si el enlace tiene ?id=1 hasta ?id=32
+            const id = urlParams.get('id');
+            if (id) {
+                const guest = BASE_INVITADOS.find(g => g.id === id);
+                if (guest) aplicarInvitado(guest);
+            } else {
+                generarQRs();
+            }
+        }
+
+        // Cargar las fotos del Drive al iniciar
+        cargarGaleria();
     });
 
+    // =========================================================================
+    // LÓGICA DE AUDIO Y BOTÓN FLOTANTE
+    // =========================================================================
     var isPlaying = false, isOpened = false, player = null;
-    function cmdYT(f, a) { const i = document.getElementById('youtube-player'); if(i && i.contentWindow) i.contentWindow.postMessage(JSON.stringify({event:'command',func:f,args:a||[]}), '*'); }
+
+    function cmdYT(f, a) {
+        const i = document.getElementById('youtube-player');
+        if (i && i.contentWindow) {
+            i.contentWindow.postMessage(JSON.stringify({ event: 'command', func: f, args: a || [] }), '*');
+        }
+    }
+
     function abrirInvitacion() {
-        if(isOpened) return; isOpened = true;
+        if (isOpened) return;
+        isOpened = true;
         document.getElementById('invitation-overlay').style.opacity = '0';
+        document.getElementById('invitation-overlay').style.pointerEvents = 'none';
         setTimeout(() => document.getElementById('invitation-overlay').style.zIndex = '-10', 500);
-        cmdYT('unMute'); cmdYT('playVideo');
-        document.getElementById('mute-icon').className = 'fa-solid fa-volume-high animate-pulse';
-        document.getElementById('mute-text').innerText = 'Música sonando';
+
+        document.getElementById('floating-music-btn').classList.remove('hidden');
+
+        cmdYT('unMute');
+        cmdYT('setVolume', [100]);
+        cmdYT('playVideo');
+        document.getElementById('mute-icon-float').className = 'fa-solid fa-volume-high text-white';
         isPlaying = true;
     }
-    function toggleMusica() { isPlaying ? cmdYT('pauseVideo') : cmdYT('playVideo'); isPlaying = !isPlaying; }
-    setInterval(() => { if (!isOpened && document.activeElement.id === 'youtube-player') abrirInvitacion(); }, 80);
-    const tag = document.createElement('script'); tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-    function onYouTubeIframeAPIReady() { player = new YT.Player('youtube-player', {events: {'onStateChange': e => {if(e.data===1) abrirInvitacion();}}}); }
 
+    function toggleMusica() {
+        if (isPlaying) {
+            cmdYT('pauseVideo');
+            document.getElementById('mute-icon-float').className = 'fa-solid fa-volume-xmark text-white';
+        } else {
+            cmdYT('unMute');
+            cmdYT('playVideo');
+            document.getElementById('mute-icon-float').className = 'fa-solid fa-volume-high text-white';
+        }
+        isPlaying = !isPlaying;
+    }
+
+    setInterval(() => {
+        if (!isOpened && document.activeElement && document.activeElement.id === 'youtube-player') {
+            abrirInvitacion();
+        }
+    }, 80);
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtube-player', {
+            events: {
+                'onStateChange': e => {
+                    if (e.data === 1 && !isOpened) abrirInvitacion();
+                }
+            }
+        });
+    }
+
+    // =========================================================================
+    // CONTADOR REGRESIVO (13 DE DICIEMBRE DE 2026 - 10:00 AM)
+    // =========================================================================
     const countDownDate = new Date("Dec 13, 2026 10:00:00").getTime();
     setInterval(() => {
         const d = countDownDate - new Date().getTime();
         if (d < 0) return;
-        document.getElementById("days").innerText = String(Math.floor(d / 86400000)).padStart(2,'0');
-        document.getElementById("hours").innerText = String(Math.floor((d % 86400000) / 3600000)).padStart(2,'0');
-        document.getElementById("minutes").innerText = String(Math.floor((d % 3600000) / 60000)).padStart(2,'0');
-        document.getElementById("seconds").innerText = String(Math.floor((d % 60000) / 1000)).padStart(2,'0');
+        document.getElementById("days").innerText = String(Math.floor(d / 86400000)).padStart(2, '0');
+        document.getElementById("hours").innerText = String(Math.floor((d % 86400000) / 3600000)).padStart(2, '0');
+        document.getElementById("minutes").innerText = String(Math.floor((d % 3600000) / 60000)).padStart(2, '0');
+        document.getElementById("seconds").innerText = String(Math.floor((d % 60000) / 1000)).padStart(2, '0');
     }, 1000);
 </script>
 </body>
