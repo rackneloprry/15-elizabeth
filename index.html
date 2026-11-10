@@ -1,94 +1,111 @@
-const NOMBRE_CARPETA = 'Fotos_15_Eli';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- METADATOS PARA LA MINIATURA DE WHATSAPP -->
+    <title>Mis 15 Años - Elizabeth</title>
+    <meta property="og:title" content="Mis 15 Años - Elizabeth" />
+    <meta property="og:description" content="Tienes una nueva invitación, por favor da clic en el enlace para responder." />
+    <meta property="og:image" content="https://i.postimg.cc/mD5BkkQC/Gemini-Generated-Image-nnkz2qnnkz2qnnkz.jpg" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Tailwind CSS & Google Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Lato:ital,wght@0,300;0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-// Busca automáticamente la carpeta "Fotos_15_Eli" en tu Drive (o la crea si no existe)
-function obtenerCarpeta() {
-  const carpetas = DriveApp.getFoldersByName(NOMBRE_CARPETA);
-  let folder;
-  if (carpetas.hasNext()) {
-    folder = carpetas.next();
-  } else {
-    folder = DriveApp.createFolder(NOMBRE_CARPETA);
-  }
-  try {
-    folder.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-  } catch (e) {}
-  return folder;
-}
+    <style>
+        :root {
+            --navy-blue: #172554;
+            --primary-blue: #1e3a8a;
+        }
 
-// 1. FUNCIÓN DE PRUEBA Y PERMISOS (Presiona "▷ Ejecutar" con esta función seleccionada)
-function autorizarPermisos() {
-  const folder = obtenerCarpeta();
-  const temp = folder.createFile("prueba_conexion.txt", "Conectado correctamente");
-  temp.setTrashed(true);
-  Logger.log("✅ ¡Conectado con éxito! Carpeta lista: " + folder.getUrl());
-}
+        body {
+            background-color: #e5e7eb;
+            font-family: 'Lato', sans-serif;
+            color: var(--navy-blue);
+            margin: 0;
+            padding: 0;
+        }
 
-// 2. OBTENER LAS ÚLTIMAS FOTOS DE LA CARPETA (doGet)
-function doGet(e) {
-  try {
-    const folder = obtenerCarpeta();
-    const files = folder.getFiles();
-    let photos = [];
-    
-    while (files.hasNext()) {
-      let file = files.next();
-      let mime = file.getMimeType();
-      if (mime && mime.indexOf('image') !== -1) {
-        let id = file.getId();
-        photos.push({
-          id: id,
-          url: "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000",
-          date: file.getDateCreated().getTime()
-        });
-      }
-    }
-    
-    // Ordenar de la más reciente a la más antigua
-    photos.sort(function(a, b) { return b.date - a.date; });
-    const urls = photos.slice(0, 30).map(function(p) { return p.url; });
-    
-    return ContentService.createTextOutput(JSON.stringify({
-      success: true,
-      folderUrl: folder.getUrl(),
-      urls: urls
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString(),
-      urls: []
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+        .font-script {
+            font-family: 'Great Vibes', cursive;
+        }
 
-// 3. GUARDAR FOTO NUEVA EN GOOGLE DRIVE (doPost)
-function doPost(e) {
-  try {
-    const folder = obtenerCarpeta();
-    const rawData = e.postData.contents;
-    const data = JSON.parse(rawData);
-    
-    const decoded = Utilities.base64Decode(data.base64);
-    const blob = Utilities.newBlob(decoded, data.mimeType || 'image/jpeg', data.fileName || ('foto_' + new Date().getTime() + '.jpg'));
-    const file = folder.createFile(blob);
-    
-    // Hacer que la foto sea visible para todos los invitados
-    try {
-      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
-    } catch (permErr) {}
-    
-    const id = file.getId();
-    return ContentService.createTextOutput(JSON.stringify({
-      success: true,
-      id: id,
-      url: "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000"
-    })).setMimeType(ContentService.MimeType.JSON);
-    
-  } catch (error) {
-    return ContentService.createTextOutput(JSON.stringify({
-      success: false,
-      error: error.toString()
-    })).setMimeType(ContentService.MimeType.JSON);
-  }
-}
+        .mobile-container {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            background-color: white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- FONDOS DE SECCIONES --- */
+        .bg-section-1, .bg-section-2, .bg-section-3 {
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .bg-section-1 {
+            background-image: url('https://i.postimg.cc/mD5BkkQC/Gemini-Generated-Image-nnkz2qnnkz2qnnkz.jpg');
+        }
+        .bg-section-2, .bg-section-3 {
+            background-image: url('https://i.postimg.cc/JzpkxcmL/Gemini-Generated-Image-j742sj742sj742sj.jpg');
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(6px);
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* BOTÓN DE MÚSICA FLOTANTE (SOLO ÍCONO EN ESQUINA) */
+        .floating-music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-blue);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.35rem;
+            box-shadow: 0 4px 15px rgba(23, 37, 84, 0.4);
+            z-index: 90;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .floating-music-btn:active {
+            transform: scale(0.90);
+        }
+
+        /* CHECKBOXES Y CARRUSELES */
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            color: var(--navy-blue);
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.75);
+            border: 1px solid rgba(30, 58, 138, 0.15);
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .checkbox-custom {
+            width: 18px;
