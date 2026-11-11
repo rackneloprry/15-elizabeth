@@ -1051,6 +1051,19 @@
         }
     }
 
+  function codificarToken(obj) {
+        return btoa(encodeURIComponent(JSON.stringify(obj))).replace(/=+$/, '');
+    }
+
+    function decodificarToken(token) {
+        try {
+            let base64 = token + '==='.slice((token.length + 3) % 4);
+            return JSON.parse(decodeURIComponent(atob(base64)));
+        } catch (e) {
+            return null;
+        }
+    }
+
     function enviarSaaSPorId(id) {
         const todos = [...BASE_INVITADOS, ...invitadosExtra];
         const item = todos.find(g => String(g.id) === String(id));
