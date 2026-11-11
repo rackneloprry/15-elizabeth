@@ -20,6 +20,9 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- Librería de Escáner QR para Check-in -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <style>
         :root {
             --navy-blue: #172554;
@@ -67,6 +70,14 @@
             backdrop-filter: blur(6px);
             border-radius: 1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        /* Tarjeta perlada sutil para el verso de la Sección 1 */
+        .quote-pearl-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.72) 0%, rgba(255, 255, 255, 0.88) 50%, rgba(255, 255, 255, 0.72) 100%);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 10px 30px rgba(23, 37, 84, 0.08);
         }
 
         /* BOTÓN DE MÚSICA FLOTANTE (SOLO ÍCONO EN ESQUINA) */
@@ -119,14 +130,59 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
         .countdown-box { display: flex; flex-direction: column; align-items: center; }
-        .countdown-number { font-size: 1.8rem; font-weight: 700; color: var(--primary-blue); }
-        .countdown-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; }
-        .countdown-separator { font-size: 1.5rem; font-weight: bold; color: var(--primary-blue); margin-top: 0.2rem; }
+        .countdown-number { font-size: 1.8rem; font-weight: 700; color: var(--primary-blue); line-height: 1.1; }
+        .countdown-label { font-size: 0.62rem; text-transform: uppercase; letter-spacing: 1px; color: #4b5563; margin-top: 2px; }
+        .countdown-separator { font-size: 1.5rem; font-weight: bold; color: var(--primary-blue); margin-top: 0.1rem; }
+
+        /* Animación suave para el indicador de deslizar */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0); opacity: 0.75; }
+            50% { transform: translateY(6px); opacity: 1; }
+        }
+        .animate-float-slow {
+            animation: floatSlow 2.4s ease-in-out infinite;
+        }
+
+        /* Estilos del lector QR */
+        #qr-reader {
+            border: none !important;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+        #qr-reader video {
+            border-radius: 0.75rem;
+            object-fit: cover;
+        }
     </style>
 </head>
 <body>
 
 <div class="mobile-container" id="mobile-wrap">
+
+    <!-- NOTIFICACIÓN TOAST PERSONALIZADA (SIN ALERT NATIVO) -->
+    <div id="custom-toast" class="hidden fixed top-4 left-1/2 -translate-x-1/2 z-[150] max-w-xs w-[90%] bg-blue-950 text-white px-4 py-3 rounded-xl shadow-2xl border border-blue-400/40 flex items-center space-x-3 transition-all duration-300">
+        <i id="custom-toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-lg shrink-0"></i>
+        <p id="custom-toast-text" class="text-xs font-semibold leading-snug"></p>
+    </div>
+
+    <!-- MODAL DE CONFIRMACIÓN PARA ELIMINAR INVITACIÓN (SIN CONFIRM NATIVO) -->
+    <div id="confirm-delete-modal" class="hidden fixed inset-0 bg-blue-950/80 z-[140] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl border border-blue-200 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3">
+                <i class="fa-regular fa-trash-can text-xl"></i>
+            </div>
+            <h4 id="confirm-modal-title" class="font-bold text-blue-950 text-base mb-1">¿Eliminar invitación?</h4>
+            <p id="confirm-modal-desc" class="text-xs text-blue-800/80 mb-4 leading-relaxed">Esta invitación se quitará de tu lista en el panel.</p>
+            <div class="flex space-x-2">
+                <button onclick="cerrarModalConfirmacion()" class="w-1/2 bg-gray-100 hover:bg-gray-200 text-blue-950 font-bold text-xs py-2.5 rounded-xl transition">
+                    Cancelar
+                </button>
+                <button id="confirm-modal-btn" class="w-1/2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-2.5 rounded-xl shadow transition">
+                    Sí, eliminar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- BOTÓN DE MÚSICA FLOTANTE (SOLO ÍCONO) -->
     <div id="floating-music-btn" onclick="toggleMusica()" class="floating-music-btn hidden" title="Música">
@@ -160,50 +216,171 @@
     </div>
 
     <!-- ================= PANEL ADMIN SECRETO (8 TOQUES CONSECUTIVOS) ================= -->
-    <div id="admin-modal" class="hidden fixed inset-0 bg-blue-950/90 z-[100] overflow-y-auto p-4 text-left">
-        <div class="bg-white rounded-2xl max-w-md mx-auto p-5 shadow-2xl border border-blue-200">
-            <div class="flex justify-between items-center border-b border-blue-100 pb-3 mb-4">
+    <div id="admin-modal" class="hidden fixed inset-0 bg-blue-950/90 z-[100] overflow-y-auto p-3 sm:p-4 text-left">
+        <div class="bg-white rounded-2xl max-w-md mx-auto p-4 sm:p-5 shadow-2xl border border-blue-200">
+            <div class="flex justify-between items-center border-b border-blue-100 pb-3 mb-3">
                 <div>
                     <h3 class="font-bold text-lg text-blue-900"><i class="fa-solid fa-sliders mr-1 text-blue-900"></i> Panel Administrador</h3>
-                    <p class="text-xs text-blue-800/70">Gestión de invitados, envíos y galería</p>
+                    <p class="text-xs text-blue-800/70">Invitaciones, Check-in QR y Reporte en Google Sheets</p>
                 </div>
                 <button onclick="cerrarAdmin()" class="text-blue-900 hover:text-blue-600 text-2xl font-bold px-2">&times;</button>
             </div>
 
-            <!-- URL Base de GitHub Pages -->
-            <div class="mb-4 bg-blue-50 p-3 rounded-xl border border-blue-200">
-                <label class="block text-xs font-bold text-blue-900 mb-1">Enlace base de tu invitación:</label>
-                <input type="text" id="admin-base-url" class="w-full px-3 py-1.5 rounded border border-blue-300 text-xs font-mono bg-white text-blue-950" value="https://rackneloprry.github.io/15-elizabeth">
+            <!-- PESTAÑAS DEL PANEL ADMIN -->
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-blue-50 p-1 rounded-xl border border-blue-200">
+                <button id="tab-btn-invitados" onclick="cambiarTabAdmin('invitados')" class="text-xs font-bold py-2 px-3 rounded-lg bg-blue-900 text-white shadow-sm transition flex items-center justify-center">
+                    <i class="fa-solid fa-users mr-1.5"></i> Invitaciones
+                </button>
+                <button id="tab-btn-checkin" onclick="cambiarTabAdmin('checkin')" class="text-xs font-bold py-2 px-3 rounded-lg text-blue-900 hover:bg-blue-100 transition flex items-center justify-center">
+                    <i class="fa-solid fa-qrcode mr-1.5"></i> Check-in QR
+                </button>
             </div>
 
-            <!-- CREAR NUEVO INVITADO Y ENVIAR POR WHATSAPP -->
-            <div class="mb-5 bg-blue-50/50 p-3.5 rounded-xl border border-blue-200 shadow-sm">
-                <p class="text-xs font-bold text-blue-900 mb-2 uppercase"><i class="fa-solid fa-user-plus mr-1 text-blue-900"></i> Crear Nuevo Invitado:</p>
-                <input type="text" id="custom-titulo" placeholder="Nombre en Portada (Ej: Familia Pérez)" class="w-full mb-2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
-                <input type="text" id="custom-invitados" placeholder="Asistentes separados por coma (Ej: Juan Pérez, Ana de Pérez)" class="w-full mb-2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
-                <input type="text" id="custom-tel" placeholder="WhatsApp (Ej: 61694886)" class="w-full mb-2.5 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
-                <div class="flex space-x-2">
-                    <button onclick="enviarCustomWhatsApp()" class="w-full bg-blue-900 text-white text-xs font-bold py-2 rounded-lg hover:bg-blue-800 flex justify-center items-center">
-                        <i class="fa-brands fa-whatsapp text-green-400 text-base mr-1.5"></i> Enviar Invitación
-                    </button>
-                    <button onclick="probarCustomEnPantalla()" class="bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold px-3 py-2 rounded-lg hover:bg-blue-200" title="Previsualizar">
-                        <i class="fa-solid fa-eye text-blue-900"></i>
+            <!-- ==================== VISTA 1: GESTIÓN DE INVITACIONES ==================== -->
+            <div id="admin-tab-invitados">
+                <!-- URL Base de GitHub Pages -->
+                <div class="mb-3 bg-blue-50 p-3 rounded-xl border border-blue-200">
+                    <label class="block text-xs font-bold text-blue-900 mb-1">Enlace base de tu invitación:</label>
+                    <input type="text" id="admin-base-url" class="w-full px-3 py-1.5 rounded border border-blue-300 text-xs font-mono bg-white text-blue-950" value="https://rackneloprry.github.io/15-elizabeth">
+                </div>
+
+                <!-- CREAR NUEVO INVITADO Y GUARDAR / ENVIAR POR WHATSAPP -->
+                <div class="mb-4 bg-blue-50/50 p-3.5 rounded-xl border border-blue-200 shadow-sm">
+                    <p class="text-xs font-bold text-blue-900 mb-2 uppercase"><i class="fa-solid fa-user-plus mr-1 text-blue-900"></i> Crear / Agregar Invitación:</p>
+                    <input type="text" id="custom-titulo" placeholder="Nombre en Portada (Ej: Familia Pérez)" class="w-full mb-2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
+                    <input type="text" id="custom-invitados" placeholder="Asistentes separados por coma (Ej: Juan Pérez, Ana de Pérez)" class="w-full mb-2 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
+                    <input type="text" id="custom-tel" placeholder="WhatsApp (Ej: 61694886)" class="w-full mb-2.5 px-3 py-1.5 rounded border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
+                    <div class="flex space-x-1.5">
+                        <button onclick="guardarCustomEnLista()" class="bg-emerald-600 text-white text-xs font-bold px-3 py-2 rounded-lg hover:bg-emerald-700 flex items-center justify-center shrink-0" title="Guardar en la lista">
+                            <i class="fa-solid fa-plus mr-1"></i> Guardar
+                        </button>
+                        <button onclick="enviarCustomWhatsApp()" class="w-full bg-blue-900 text-white text-xs font-bold py-2 px-2 rounded-lg hover:bg-blue-800 flex justify-center items-center">
+                            <i class="fa-brands fa-whatsapp text-green-400 text-base mr-1"></i> Guardar y Enviar
+                        </button>
+                        <button onclick="probarCustomEnPantalla()" class="bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold px-2.5 py-2 rounded-lg hover:bg-blue-200 shrink-0" title="Previsualizar">
+                            <i class="fa-solid fa-eye text-blue-900"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FIJAR FOTOS EN EL CARRUSEL (ADMIN) -->
+                <div class="mb-4 bg-blue-50/50 p-3 rounded-xl border border-blue-200 shadow-sm">
+                    <p class="text-xs font-bold text-blue-900 mb-1 uppercase"><i class="fa-solid fa-thumbtack mr-1 text-blue-900"></i> Fijar Fotos en Galería:</p>
+                    <p class="text-[0.68rem] text-blue-800 mb-2">Toca una foto subida para fijarla/desfijarla en los primeros lugares del reel:</p>
+                    <div id="admin-pin-photos" class="flex space-x-2 overflow-x-auto pb-1 hide-scrollbar">
+                        <span class="text-[0.68rem] text-blue-800 italic">Cargando fotos del Drive...</span>
+                    </div>
+                </div>
+
+                <!-- BUSCADOR Y LISTA DE INVITADOS CON OPCIÓN DE ELIMINAR -->
+                <div class="flex items-center justify-between mb-2">
+                    <p class="text-xs font-bold text-blue-900 uppercase">
+                        <i class="fa-solid fa-users mr-1 text-blue-900"></i> Lista de Invitaciones (<span id="admin-total-groups">0</span>):
+                    </p>
+                    <button onclick="restaurarInvitadosPorDefecto()" class="text-[0.65rem] text-blue-700 hover:text-blue-950 underline font-semibold" title="Restaurar invitados originales">
+                        <i class="fa-solid fa-rotate-left mr-0.5"></i> Restaurar originales
                     </button>
                 </div>
-            </div>
 
-            <!-- FIJAR FOTOS EN EL CARRUSEL (ADMIN) -->
-            <div class="mb-5 bg-blue-50/50 p-3.5 rounded-xl border border-blue-200 shadow-sm">
-                <p class="text-xs font-bold text-blue-900 mb-1 uppercase"><i class="fa-solid fa-thumbtack mr-1 text-blue-900"></i> Fijar Fotos en Galería:</p>
-                <p class="text-[0.68rem] text-blue-800 mb-2">Toca una foto subida para fijarla/desfijarla en los primeros lugares del reel:</p>
-                <div id="admin-pin-photos" class="flex space-x-2 overflow-x-auto pb-1 hide-scrollbar">
-                    <span class="text-[0.68rem] text-blue-800 italic">Cargando fotos del Drive...</span>
+                <div class="mb-2.5 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-blue-400 text-xs"></i>
+                    <input type="text" id="admin-search-input" oninput="renderizarListaAdmin()" placeholder="Buscar invitado o familia..." class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
                 </div>
+
+                <div id="admin-guest-list" class="space-y-2 max-h-80 overflow-y-auto pr-1 hide-scrollbar"></div>
             </div>
 
-            <!-- LISTA OFICIAL DE INVITADOS (1 AL 32) -->
-            <p class="text-xs font-bold text-blue-900 mb-2 uppercase"><i class="fa-solid fa-users mr-1 text-blue-900"></i> Lista Oficial (IDs 1 al 32):</p>
-            <div id="admin-guest-list" class="space-y-2 max-h-72 overflow-y-auto pr-1 hide-scrollbar"></div>
+            <!-- ==================== VISTA 2: ESCÁNER CHECK-IN Y REPORTE GOOGLE SHEETS ==================== -->
+            <div id="admin-tab-checkin" class="hidden">
+                <!-- Resumen Estadístico de Check-in -->
+                <div class="grid grid-cols-3 gap-2 mb-3 text-center">
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-2">
+                        <p class="text-[0.65rem] uppercase font-bold text-blue-800">Total Pases</p>
+                        <p id="stat-total-pases" class="text-xl font-bold text-blue-950">0</p>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-2">
+                        <p class="text-[0.65rem] uppercase font-bold text-emerald-800">Check-in</p>
+                        <p id="stat-checked-in" class="text-xl font-bold text-emerald-700">0</p>
+                    </div>
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-2">
+                        <p class="text-[0.65rem] uppercase font-bold text-amber-800">Pendientes</p>
+                        <p id="stat-pending" class="text-xl font-bold text-amber-700">0</p>
+                    </div>
+                </div>
+
+                <!-- ESCÁNER DE CÁMARA QR -->
+                <div class="bg-blue-950 text-white p-3.5 rounded-xl mb-3 shadow-inner">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-camera text-emerald-400"></i>
+                            <span class="text-xs font-bold uppercase tracking-wider">Escáner de Pases QR</span>
+                        </div>
+                        <button id="btn-toggle-scanner" onclick="toggleEscanerQR()" class="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow">
+                            <i class="fa-solid fa-play mr-1"></i> Iniciar Cámara
+                        </button>
+                    </div>
+
+                    <!-- Contenedor de Cámara html5-qrcode -->
+                    <div id="qr-reader-wrapper" class="hidden mt-2">
+                        <div id="qr-reader" class="w-full bg-black rounded-xl overflow-hidden"></div>
+                        <p class="text-[0.68rem] text-blue-200 text-center mt-1.5">Apunta la cámara al código QR del invitado</p>
+                    </div>
+
+                    <!-- Opción alternativa: Escanear desde imagen QR -->
+                    <div class="mt-2 pt-2 border-t border-blue-800/70 flex items-center justify-between">
+                        <span class="text-[0.68rem] text-blue-200">¿Tienes captura del QR?</span>
+                        <label for="qr-file-input" class="text-[0.7rem] bg-blue-800 hover:bg-blue-700 text-white font-semibold px-2.5 py-1 rounded cursor-pointer transition">
+                            <i class="fa-regular fa-image mr-1"></i> Subir imagen QR
+                        </label>
+                        <input type="file" id="qr-file-input" accept="image/*" class="hidden" onchange="escanearArchivoQR(event)">
+                    </div>
+
+                    <!-- Banner de Resultado del Último Escaneo -->
+                    <div id="last-scan-banner" class="hidden mt-2.5 p-2.5 rounded-lg bg-emerald-600/90 border border-emerald-300 text-white text-xs">
+                        <div class="flex items-center space-x-2">
+                            <i class="fa-solid fa-circle-check text-lg text-white shrink-0"></i>
+                            <div>
+                                <p id="last-scan-name" class="font-bold text-sm leading-tight"></p>
+                                <p id="last-scan-group" class="text-[0.68rem] opacity-90"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BOTONES DE REPORTE GOOGLE SHEETS -->
+                <div class="mb-3 bg-emerald-50/80 p-3 rounded-xl border border-emerald-200">
+                    <p class="text-xs font-bold text-emerald-950 mb-1.5 uppercase flex items-center">
+                        <i class="fa-solid fa-file-spreadsheet mr-1.5 text-emerald-700"></i> Reporte para Google Sheets:
+                    </p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="exportarReporteGoogleSheets()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow flex items-center justify-center transition">
+                            <i class="fa-solid fa-download mr-1.5"></i> Descargar .CSV (Sheets)
+                        </button>
+                        <button onclick="sincronizarCheckInsConDrive()" class="bg-blue-900 hover:bg-blue-800 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow flex items-center justify-center transition">
+                            <i class="fa-brands fa-google-drive mr-1.5"></i> Enviar a Google Sheet
+                        </button>
+                    </div>
+                    <button onclick="copiarTablaPortapapeles()" class="w-full mt-2 bg-white hover:bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold text-[0.7rem] py-1.5 rounded-lg transition flex items-center justify-center">
+                        <i class="fa-regular fa-copy mr-1.5"></i> Copiar tabla lista para pegar en Google Sheets
+                    </button>
+                </div>
+
+                <!-- FILTROS DE ESTADO DE CHECK-IN -->
+                <div class="flex space-x-1.5 mb-2">
+                    <button id="filter-all" onclick="setFiltroCheckIn('all')" class="flex-1 text-[0.7rem] font-bold py-1.5 rounded-lg bg-blue-900 text-white">Todos</button>
+                    <button id="filter-checked" onclick="setFiltroCheckIn('checked')" class="flex-1 text-[0.7rem] font-bold py-1.5 rounded-lg bg-blue-50 text-blue-900 border border-blue-200">Con Check-in</button>
+                    <button id="filter-pending" onclick="setFiltroCheckIn('pending')" class="flex-1 text-[0.7rem] font-bold py-1.5 rounded-lg bg-blue-50 text-blue-900 border border-blue-200">Pendientes</button>
+                </div>
+
+                <!-- Buscador de Check-in manual -->
+                <div class="mb-2 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-blue-400 text-xs"></i>
+                    <input type="text" id="checkin-search-input" oninput="renderizarListaCheckIn()" placeholder="Buscar asistente para check-in manual..." class="w-full pl-8 pr-3 py-1.5 rounded-lg border border-blue-200 text-xs focus:outline-none focus:border-blue-800">
+                </div>
+
+                <!-- Lista individual de Asistentes y su estado Check-in -->
+                <div id="admin-checkin-list" class="space-y-1.5 max-h-72 overflow-y-auto pr-1 hide-scrollbar"></div>
+            </div>
         </div>
     </div>
 
@@ -245,33 +422,68 @@
         </div>
     </div>
 
-    <!-- ================= SECCIÓN 1: PORTADA ================= -->
-    <section class="bg-section-1 min-h-screen relative flex flex-col items-center justify-between py-12 px-6">
-        <div class="w-full relative mt-6 flex flex-col items-center">
+    <!-- ================= SECCIÓN 1: PORTADA (MEJOR DISTRIBUCIÓN ARMONIOSA) ================= -->
+    <section class="bg-section-1 min-h-screen relative flex flex-col items-center justify-evenly py-10 px-6">
+        
+        <!-- Bloque Superior: Título Mis 15 Años Elizabeth -->
+        <div class="w-full relative flex flex-col items-center pt-2">
             <div onclick="toqueSecretoAdmin()" class="relative flex items-center justify-center w-full cursor-pointer select-none">
                 <span class="font-script text-5xl text-blue-900 absolute left-8 top-2">Mis</span>
-                <span class="font-script text-[10.5rem] leading-none text-blue-900">15</span>
+                <span class="font-script text-[10.5rem] leading-none text-blue-900 drop-shadow-sm">15</span>
             </div>
             <div class="flex items-center justify-center -mt-6 z-10">
                 <span class="font-script text-5xl text-blue-900">Años</span>
             </div>
-            <div class="font-script text-[4.8rem] text-blue-900 text-center -mt-2 leading-tight">Elizabeth</div>
+            <div class="font-script text-[4.8rem] text-blue-900 text-center -mt-2 leading-tight drop-shadow-sm">Elizabeth</div>
         </div>
 
-        <div class="mt-auto mb-10 text-center px-4 w-full z-10 relative">
-            <p class="text-[0.95rem] font-semibold text-blue-900 mb-6 italic leading-relaxed">
-                Hace 15 años Dios me concedió<br>
-                la vida y doy fe de su fidelidad<br>
-                y amor, teniendo la certeza<br>
-                que el siempre estará conmigo<br>
-                bendiciendo mi vida,<br>
-                con Acción de Gracias<br>
-                quiero celebrar mis 15 años.
-            </p>
+        <!-- Bloque Central / Inferior Armónico: Mensaje de Acción de Gracias con Ornamentos Fine-Line -->
+        <div class="w-full max-w-xs mx-auto z-10 relative my-2">
+            <div class="quote-pearl-card rounded-3xl px-6 py-6 text-center relative">
+                
+                <!-- Ornamento Superior Minimalista Fine-Line -->
+                <div class="flex items-center justify-center mb-3 text-blue-900/80">
+                    <svg class="w-36 h-5" viewBox="0 0 160 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10 10H62" stroke="#1e3a8a" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M98 10H150" stroke="#1e3a8a" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M80 3L84 10L80 17L76 10L80 3Z" stroke="#1e3a8a" stroke-width="1.1" stroke-linejoin="round"/>
+                        <circle cx="69" cy="10" r="1.5" fill="#1e3a8a"/>
+                        <circle cx="91" cy="10" r="1.5" fill="#1e3a8a"/>
+                    </svg>
+                </div>
+
+                <!-- Texto Principal Mejor Distribuido -->
+                <p class="text-[1.04rem] font-semibold text-blue-900 italic leading-loose tracking-wide">
+                    Hace 15 años Dios me concedió<br>
+                    la vida y doy fe de su fidelidad<br>
+                    y amor, teniendo la certeza<br>
+                    que el siempre estará conmigo<br>
+                    bendiciendo mi vida,<br>
+                    con Acción de Gracias<br>
+                    quiero celebrar mis 15 años.
+                </p>
+
+                <!-- Ornamento Inferior Minimalista Fine-Line -->
+                <div class="flex items-center justify-center mt-3 text-blue-900/80">
+                    <svg class="w-36 h-5" viewBox="0 0 160 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 10H65" stroke="#1e3a8a" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M95 10H138" stroke="#1e3a8a" stroke-width="1" stroke-linecap="round"/>
+                        <path d="M80 5C82 8 85 10 88 10C85 10 82 12 80 15C78 12 75 10 72 10C75 10 78 8 80 5Z" stroke="#1e3a8a" stroke-width="1.1" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Indicador sutil para deslizar hacia abajo -->
+        <div class="flex flex-col items-center justify-center animate-float-slow select-none pt-1">
+            <span class="text-[0.65rem] uppercase tracking-[0.22em] text-blue-900/80 font-bold mb-1">Desliza</span>
+            <svg class="w-5 h-5 text-blue-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
         </div>
     </section>
 
-    <!-- ================= SECCIÓN 2: FECHA Y CONTADOR ================= -->
+    <!-- ================= SECCIÓN 2: FECHA Y CONTADOR CON "FALTAN" ================= -->
     <section class="bg-section-2 min-h-screen relative flex flex-col items-center py-12 px-6">
         <div class="relative mt-4">
             <div class="w-56 h-72 rounded-t-full rounded-b-md overflow-hidden border-4 border-white shadow-lg relative z-10">
@@ -304,14 +516,18 @@
         
         <p class="text-sm font-bold text-blue-900 mt-1">Hora: 10:00am</p>
 
-        <div class="glass-panel w-full mt-6 p-4 flex justify-around items-start">
-            <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Días</span></div>
-            <span class="countdown-separator">:</span>
-            <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Horas</span></div>
-            <span class="countdown-separator">:</span>
-            <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutos</span></div>
-            <span class="countdown-separator">:</span>
-            <div class="countdown-box"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Segundos</span></div>
+        <!-- CUENTA REGRESIVA CON "FALTAN" ARRIBA -->
+        <div class="glass-panel w-full mt-6 px-4 pt-3 pb-4 flex flex-col items-center border border-white/80">
+            <p class="font-script text-3xl text-blue-900 leading-none mb-2">Faltan</p>
+            <div class="w-full flex justify-around items-start">
+                <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Días</span></div>
+                <span class="countdown-separator">:</span>
+                <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Horas</span></div>
+                <span class="countdown-separator">:</span>
+                <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutos</span></div>
+                <span class="countdown-separator">:</span>
+                <div class="countdown-box"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Segundos</span></div>
+            </div>
         </div>
     </section>
 
@@ -321,11 +537,39 @@
         <img src="https://i.postimg.cc/k5cRGQ1k/15-anos-Eli-(Sitio-web)-(3).png" alt="Palmera" class="absolute -top-2 -right-4 w-32 h-auto object-contain z-0 opacity-90 pointer-events-none">
         <img src="https://i.postimg.cc/vHJVNH6R/15-anos-Eli-(Sitio-web)-(4).png" alt="Flor de hibisco" class="absolute top-4 -left-6 w-28 h-auto object-contain z-0 opacity-90 pointer-events-none rotate-[-15deg]">
 
-        <!-- UBICACIÓN -->
+        <!-- UBICACIÓN CON ÍCONOS MINIMALISTAS FINE-LINE SIN RELLENO -->
         <div class="text-center mb-6 mt-2 relative z-10">
-            <h3 class="font-script text-5xl text-blue-900 mb-2">Recepción:</h3>
+            <div class="flex items-center justify-center space-x-3 mb-2">
+                <!-- Ícono Izquierdo Recepción: Copas de Brindis Minimalistas Fine-Line -->
+                <svg class="w-8 h-8 text-blue-900 shrink-0" viewBox="0 0 32 32" fill="none" stroke="#1e3a8a" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 5h6l-1.5 9a3 3 0 01-3 2.5v0A3 3 0 017.5 14L9 5z"/>
+                    <path d="M10.5 16.5L9 25"/>
+                    <path d="M6.5 25h5"/>
+                    <path d="M8.2 10h5.6"/>
+                    <path d="M17 5h6l1.5 9a3 3 0 01-3 2.5v0a3 3 0 01-3-2.5L17 5z"/>
+                    <path d="M21.5 16.5L23 25"/>
+                    <path d="M20.5 25h5"/>
+                    <path d="M18.2 10h5.6"/>
+                    <path d="M16 2v2"/>
+                    <path d="M14 3l1 1"/>
+                    <path d="M18 3l-1 1"/>
+                </svg>
+
+                <h3 class="font-script text-5xl text-blue-900">Recepción:</h3>
+
+                <!-- Ícono Derecho Recepción: Pin de Ubicación / Destello Minimalista Fine-Line -->
+                <svg class="w-8 h-8 text-blue-900 shrink-0" viewBox="0 0 32 32" fill="none" stroke="#1e3a8a" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 27s-8-6.2-8-13a8 8 0 1116 0c0 6.8-8 13-8 13z"/>
+                    <circle cx="16" cy="14" r="3"/>
+                </svg>
+            </div>
+
             <div class="flex items-center justify-center text-blue-900 mb-1">
-                <i class="fa-solid fa-location-dot text-2xl mr-3 text-blue-900"></i>
+                <!-- Pin Fine-Line junto a la dirección -->
+                <svg class="w-6 h-6 mr-2 text-blue-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#1e3a8a" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21s-6-4.65-6-10a6 6 0 1112 0c0 5.35-6 10-6 10z"/>
+                    <circle cx="12" cy="11" r="2.2"/>
+                </svg>
                 <p class="text-[0.95rem] font-semibold italic leading-tight">Rancho La Sagrada Familia,<br>Playa San Diego.</p>
             </div>
             
@@ -339,12 +583,30 @@
             </div>
         </div>
 
-        <!-- VESTIMENTA -->
+        <!-- VESTIMENTA CON ÍCONOS MINIMALISTAS FINE-LINE SIN RELLENO -->
         <div class="text-center mb-6 w-full relative z-10">
-            <div class="flex items-center justify-center space-x-4 mb-2">
-                <i class="fa-solid fa-shirt text-2xl text-blue-900"></i>
+            <div class="flex items-center justify-center space-x-3 mb-2">
+                <!-- Ícono Izquierdo: Camisa / Guayabera Minimalista Fine-Line sin relleno -->
+                <svg class="w-9 h-9 text-blue-900 shrink-0" viewBox="0 0 32 32" fill="none" stroke="#1e3a8a" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 5l5 3.5L21 5"/>
+                    <path d="M11 5L5 8.5 7.5 14 10 12.5V26h12V12.5L24.5 14 27 8.5 21 5"/>
+                    <path d="M16 8.5V26"/>
+                    <circle cx="16" cy="13" r="0.6" fill="#1e3a8a"/>
+                    <circle cx="16" cy="17" r="0.6" fill="#1e3a8a"/>
+                    <circle cx="16" cy="21" r="0.6" fill="#1e3a8a"/>
+                </svg>
+
                 <h3 class="font-script text-4xl text-blue-900">Código de Vestimenta:</h3>
-                <i class="fa-solid fa-person-dress text-2xl text-blue-900"></i>
+
+                <!-- Ícono Derecho: Vestido Elegante Minimalista Fine-Line sin relleno -->
+                <svg class="w-9 h-9 text-blue-900 shrink-0" viewBox="0 0 32 32" fill="none" stroke="#1e3a8a" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12.5 5L14 10.5h4L19.5 5"/>
+                    <path d="M12.5 5C14 7 18 7 19.5 5"/>
+                    <path d="M14 10.5L12.5 14h7L18 10.5"/>
+                    <path d="M12.5 14L7.5 26.5c3 1.2 14 1.2 17 0L19.5 14"/>
+                    <path d="M14.2 14l-2.2 12.5"/>
+                    <path d="M17.8 14l2.2 12.5"/>
+                </svg>
             </div>
             <p class="text-[0.95rem] font-bold text-blue-900 italic">Casual de Playa en blanco.</p>
             <p class="text-xs text-blue-900 mt-1 font-semibold italic">Nota: se reserva color AZUL para Quinceañera.</p>
@@ -453,8 +715,8 @@
     const NUMERO_WHATSAPP_RECEPCION = "50373442196";
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwu5CM81cFCHa3uAz8gLBC1DHdNBGQ9o0c405qdr_DZzM4EL_7iM-vL9bzuirlV6xHscw/exec";
 
-    // BASE DE DATOS DE INVITADOS (ID 1 AL 32)
-    const BASE_INVITADOS = [
+    // BASE DE DATOS ORIGINAL DE INVITADOS (ID 1 AL 32)
+    const DEFAULT_INVITADOS = [
         {"id": "1", "telefono": "50373442196", "titulo": "Elizabeth Carranza", "invitados": ["Elizabeth Carranza"]},
         {"id": "2", "telefono": "50378588333", "titulo": "María Caballero", "invitados": ["María Caballero"]},
         {"id": "3", "telefono": "50361694886", "titulo": "David López y Abuela Raymunda", "invitados": ["David López", "Abuela Raymunda Portillo"]},
@@ -489,10 +751,103 @@
         {"id": "32", "telefono": "50370019613", "titulo": "Arely Lemus Sanches e Hijo", "invitados": ["Arely Lemus Sanches", "Hijo de Arely"]}
     ];
 
+    const STORAGE_KEY_INVITADOS = 'eli_invitados_db_v1';
+    const STORAGE_KEY_CHECKINS = 'eli_checkins_db_v1';
+
+    let BASE_INVITADOS = cargarInvitadosGuardados();
+    let REGISTRO_CHECKINS = cargarCheckInsGuardados();
     let invitadoActual = null;
     let toquesAdmin = 0, timerToques = null;
     let fotosRecibidasDrive = [];
+    let filtroCheckInActual = 'all';
+    let html5QrCode = null;
+    let scannerActivo = false;
+    let toastTimer = null;
 
+    // =========================================================================
+    // SISTEMA DE NOTIFICACIONES Y MODALES PERSONALIZADOS
+    // =========================================================================
+    function mostrarToast(mensaje, tipo = 'success') {
+        const toast = document.getElementById('custom-toast');
+        const icon = document.getElementById('custom-toast-icon');
+        const text = document.getElementById('custom-toast-text');
+
+        text.innerText = mensaje;
+        if (tipo === 'error') {
+            icon.className = 'fa-solid fa-circle-exclamation text-amber-400 text-lg shrink-0';
+        } else if (tipo === 'info') {
+            icon.className = 'fa-solid fa-circle-info text-sky-400 text-lg shrink-0';
+        } else {
+            icon.className = 'fa-solid fa-circle-check text-emerald-400 text-lg shrink-0';
+        }
+
+        toast.classList.remove('hidden');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3500);
+    }
+
+    function abrirModalConfirmacion(titulo, descripcion, onConfirmCallback) {
+        const modal = document.getElementById('confirm-delete-modal');
+        document.getElementById('confirm-modal-title').innerText = titulo;
+        document.getElementById('confirm-modal-desc').innerText = descripcion;
+        const btn = document.getElementById('confirm-modal-btn');
+        btn.onclick = () => {
+            cerrarModalConfirmacion();
+            onConfirmCallback();
+        };
+        modal.classList.remove('hidden');
+    }
+
+    function cerrarModalConfirmacion() {
+        document.getElementById('confirm-delete-modal').classList.add('hidden');
+    }
+
+    // =========================================================================
+    // PERSISTENCIA DE INVITADOS Y CHECK-INS EN LOCALSTORAGE
+    // =========================================================================
+    function cargarInvitadosGuardados() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY_INVITADOS);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (Array.isArray(parsed)) return parsed;
+            }
+        } catch (e) {}
+        return JSON.parse(JSON.stringify(DEFAULT_INVITADOS));
+    }
+
+    function guardarInvitadosEnStorage() {
+        try {
+            localStorage.setItem(STORAGE_KEY_INVITADOS, JSON.stringify(BASE_INVITADOS));
+        } catch (e) {}
+    }
+
+    function cargarCheckInsGuardados() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY_CHECKINS);
+            if (raw) return JSON.parse(raw) || {};
+        } catch (e) {}
+        return {};
+    }
+
+    function guardarCheckInsEnStorage() {
+        try {
+            localStorage.setItem(STORAGE_KEY_CHECKINS, JSON.stringify(REGISTRO_CHECKINS));
+        } catch (e) {}
+    }
+
+    // Genera una clave única normalizada por grupo + asistente
+    function obtenerClaveAsistente(tituloGrupo, nombreAsistente) {
+        const g = String(tituloGrupo || '').trim().toLowerCase();
+        const a = String(nombreAsistente || '').trim().toLowerCase();
+        return `${g}__${a}`;
+    }
+
+    // =========================================================================
+    // ACCESO SECRETO AL PANEL ADMINISTRADOR (8 TOQUES)
+    // =========================================================================
     function toqueSecretoAdmin() {
         toquesAdmin++;
         clearTimeout(timerToques);
@@ -504,6 +859,31 @@
         }
     }
 
+    function cambiarTabAdmin(tab) {
+        const tabInv = document.getElementById('admin-tab-invitados');
+        const tabChk = document.getElementById('admin-tab-checkin');
+        const btnInv = document.getElementById('tab-btn-invitados');
+        const btnChk = document.getElementById('tab-btn-checkin');
+
+        if (tab === 'checkin') {
+            tabInv.classList.add('hidden');
+            tabChk.classList.remove('hidden');
+            btnChk.className = 'text-xs font-bold py-2 px-3 rounded-lg bg-blue-900 text-white shadow-sm transition flex items-center justify-center';
+            btnInv.className = 'text-xs font-bold py-2 px-3 rounded-lg text-blue-900 hover:bg-blue-100 transition flex items-center justify-center';
+            actualizarEstadisticasYListaCheckIn();
+        } else {
+            detenerEscanerQR();
+            tabChk.classList.add('hidden');
+            tabInv.classList.remove('hidden');
+            btnInv.className = 'text-xs font-bold py-2 px-3 rounded-lg bg-blue-900 text-white shadow-sm transition flex items-center justify-center';
+            btnChk.className = 'text-xs font-bold py-2 px-3 rounded-lg text-blue-900 hover:bg-blue-100 transition flex items-center justify-center';
+            renderizarListaAdmin();
+        }
+    }
+
+    // =========================================================================
+    // PERSONALIZACIÓN DE LA INVITACIÓN Y GENERACIÓN DE QRs
+    // =========================================================================
     function aplicarInvitado(datos) {
         invitadoActual = datos;
 
@@ -584,36 +964,110 @@
         window.open(`https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_RECEPCION}&text=${encodeURIComponent(msj)}`, '_blank');
     }
 
+    // =========================================================================
+    // PANEL ADMIN: GESTIÓN Y ELIMINACIÓN DE INVITACIONES
+    // =========================================================================
     function abrirAdmin() {
         document.getElementById('admin-modal').classList.remove('hidden');
         const baseInput = document.getElementById('admin-base-url');
         if (!window.location.hostname.includes("googleusercontent.com")) {
             baseInput.value = window.location.origin + window.location.pathname;
         }
-        const lista = document.getElementById('admin-guest-list');
-        lista.innerHTML = "";
-        BASE_INVITADOS.forEach((item, i) => {
-            lista.innerHTML += `
-                <div class="p-2.5 bg-white rounded-lg border border-blue-200 flex items-center justify-between text-xs shadow-sm">
-                    <div class="pr-2">
-                        <p class="font-bold text-blue-950">${item.id}. ${item.titulo}</p>
-                        <p class="text-[0.68rem] text-blue-800">${item.invitados.length} pase(s)</p>
-                    </div>
-                    <div class="flex space-x-1 shrink-0">
-                        <button onclick="previsualizarInvitado(${i})" class="bg-blue-50 text-blue-900 border border-blue-200 font-bold px-2.5 py-1.5 rounded hover:bg-blue-100" title="Ver">
-                            <i class="fa-solid fa-eye text-blue-900"></i>
-                        </button>
-                        <button onclick="enviarSaaS(${i})" class="bg-blue-900 text-white font-bold px-3 py-1.5 rounded hover:bg-blue-800 flex items-center">
-                            <i class="fa-brands fa-whatsapp text-green-400 mr-1 text-sm"></i> Enviar
-                        </button>
-                    </div>
-                </div>`;
-        });
+        renderizarListaAdmin();
+        actualizarEstadisticasYListaCheckIn();
         renderizarAdminFotosFijadas();
     }
 
     function cerrarAdmin() {
+        detenerEscanerQR();
         document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function renderizarListaAdmin() {
+        const lista = document.getElementById('admin-guest-list');
+        const totalSpan = document.getElementById('admin-total-groups');
+        const query = (document.getElementById('admin-search-input')?.value || '').trim().toLowerCase();
+
+        totalSpan.innerText = BASE_INVITADOS.length;
+        lista.innerHTML = "";
+
+        const filtrados = BASE_INVITADOS.map((item, idx) => ({ item, idx })).filter(({ item }) => {
+            if (!query) return true;
+            return item.titulo.toLowerCase().includes(query) ||
+                   item.invitados.some(p => p.toLowerCase().includes(query)) ||
+                   String(item.id).toLowerCase().includes(query);
+        });
+
+        if (filtrados.length === 0) {
+            lista.innerHTML = '<p class="text-xs text-center text-blue-800/70 py-4 italic">No se encontraron invitaciones con ese nombre.</p>';
+            return;
+        }
+
+        filtrados.forEach(({ item, idx }) => {
+            // Contar cuántos de este grupo ya hicieron check-in
+            const checkCount = item.invitados.filter(p => REGISTRO_CHECKINS[obtenerClaveAsistente(item.titulo, p)]?.checkedIn).length;
+            const badgeCheck = checkCount > 0
+                ? `<span class="ml-1.5 text-[0.6rem] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded-full"><i class="fa-solid fa-check mr-0.5"></i>${checkCount}/${item.invitados.length}</span>`
+                : '';
+
+            lista.innerHTML += `
+                <div class="p-2.5 bg-white rounded-xl border border-blue-200 flex items-center justify-between text-xs shadow-sm">
+                    <div class="pr-2 overflow-hidden">
+                        <p class="font-bold text-blue-950 truncate">${item.id}. ${item.titulo}</p>
+                        <p class="text-[0.68rem] text-blue-800 flex items-center mt-0.5">
+                            <span>${item.invitados.length} pase(s)</span>
+                            ${badgeCheck}
+                        </p>
+                    </div>
+                    <div class="flex space-x-1 shrink-0">
+                        <button onclick="previsualizarInvitado(${idx})" class="bg-blue-50 text-blue-900 border border-blue-200 font-bold px-2.5 py-1.5 rounded-lg hover:bg-blue-100 transition" title="Previsualizar invitación">
+                            <i class="fa-solid fa-eye text-blue-900"></i>
+                        </button>
+                        <button onclick="enviarSaaS(${idx})" class="bg-blue-900 text-white font-bold px-2.5 py-1.5 rounded-lg hover:bg-blue-800 flex items-center transition" title="Enviar por WhatsApp">
+                            <i class="fa-brands fa-whatsapp text-green-400 mr-1 text-sm"></i> Enviar
+                        </button>
+                        <button onclick="confirmarEliminarInvitado(${idx})" class="bg-red-50 text-red-600 border border-red-200 font-bold px-2.5 py-1.5 rounded-lg hover:bg-red-100 transition" title="Eliminar invitación">
+                            <i class="fa-regular fa-trash-can"></i>
+                        </button>
+                    </div>
+                </div>`;
+        });
+    }
+
+    function confirmarEliminarInvitado(index) {
+        const item = BASE_INVITADOS[index];
+        if (!item) return;
+        abrirModalConfirmacion(
+            "¿Eliminar invitación?",
+            `Se eliminará la invitación de "${item.titulo}" (${item.invitados.length} pase/s) del panel.`,
+            () => {
+                BASE_INVITADOS.splice(index, 1);
+                guardarInvitadosEnStorage();
+                renderizarListaAdmin();
+                actualizarEstadisticasYListaCheckIn();
+                mostrarToast(`Invitación "${item.titulo}" eliminada`, 'info');
+            }
+        );
+    }
+
+    function restaurarInvitadosPorDefecto() {
+        abrirModalConfirmacion(
+            "¿Restaurar lista original?",
+            "Se restaurarán las 32 invitaciones originales sin borrar las nuevas que hayas agregado.",
+            () => {
+                const titulosActuales = new Set(BASE_INVITADOS.map(i => i.titulo.toLowerCase()));
+                DEFAULT_INVITADOS.forEach(def => {
+                    if (!titulosActuales.has(def.titulo.toLowerCase())) {
+                        BASE_INVITADOS.push(JSON.parse(JSON.stringify(def)));
+                    }
+                });
+                BASE_INVITADOS.sort((a, b) => (parseInt(a.id, 10) || 999) - (parseInt(b.id, 10) || 999));
+                guardarInvitadosEnStorage();
+                renderizarListaAdmin();
+                actualizarEstadisticasYListaCheckIn();
+                mostrarToast("Invitaciones originales restauradas");
+            }
+        );
     }
 
     function previsualizarInvitado(index) {
@@ -624,19 +1078,47 @@
     function enviarSaaS(index) {
         const item = BASE_INVITADOS[index];
         const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
-        const link = `${baseUrl}?id=${item.id}`;
+        // Si es un invitado original (1 al 32), usa ?id=, de lo contrario usa parámetros personalizados para funcionar en cualquier dispositivo
+        const esOriginal = DEFAULT_INVITADOS.some(d => d.id === String(item.id) && d.titulo === item.titulo);
+        const link = esOriginal
+            ? `${baseUrl}?id=${item.id}`
+            : `${baseUrl}?titulo=${encodeURIComponent(item.titulo)}&invitados=${encodeURIComponent(item.invitados.join(', '))}`;
         const msj = `¡Hola *${item.titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${link}`;
-        window.open(item.telefono ? `https://api.whatsapp.com/send?phone=${item.telefono}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+        window.open(item.telefono ? `https://api.whatsapp.com/send?phone=${item.telefono}&text=${encodeURIComponent(msj)}`, '_blank');
     }
 
     function construirCustomObj() {
         const titulo = document.getElementById('custom-titulo').value.trim() || "Invitado Especial";
         const invStr = document.getElementById('custom-invitados').value.trim() || titulo;
+        let tel = document.getElementById('custom-tel').value.replace(/\D/g, '');
+        if (tel.length === 8) tel = "503" + tel;
+        const maxId = BASE_INVITADOS.reduce((max, item) => Math.max(max, parseInt(item.id, 10) || 0), 32);
         return {
-            id: "",
+            id: String(maxId + 1),
+            telefono: tel,
             titulo: titulo,
             invitados: invStr.split(',').map(s => s.trim()).filter(Boolean)
         };
+    }
+
+    function guardarCustomEnLista() {
+        const titulo = document.getElementById('custom-titulo').value.trim();
+        const invStr = document.getElementById('custom-invitados').value.trim();
+        if (!titulo || !invStr) {
+            mostrarToast("Escribe el Nombre en Portada y los Asistentes.", "error");
+            return null;
+        }
+        const nuevo = construirCustomObj();
+        BASE_INVITADOS.push(nuevo);
+        guardarInvitadosEnStorage();
+        renderizarListaAdmin();
+        actualizarEstadisticasYListaCheckIn();
+
+        document.getElementById('custom-titulo').value = '';
+        document.getElementById('custom-invitados').value = '';
+        document.getElementById('custom-tel').value = '';
+        mostrarToast(`"${nuevo.titulo}" guardado en la lista`);
+        return nuevo;
     }
 
     function probarCustomEnPantalla() {
@@ -649,18 +1131,388 @@
         const invStr = document.getElementById('custom-invitados').value.trim();
 
         if (!titulo || !invStr) {
-            alert("Por favor escribe el Nombre en Portada y los Asistentes.");
+            mostrarToast("Por favor escribe el Nombre en Portada y los Asistentes.", "error");
             return;
         }
 
-        let tel = document.getElementById('custom-tel').value.replace(/\D/g, '');
-        if (tel.length === 8) tel = "503" + tel;
+        const nuevo = guardarCustomEnLista();
+        if (!nuevo) return;
 
         const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
-        const linkPersonalizado = `${baseUrl}?titulo=${encodeURIComponent(titulo)}&invitados=${encodeURIComponent(invStr)}`;
-        const msj = `¡Hola *${titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${linkPersonalizado}`;
+        const linkPersonalizado = `${baseUrl}?titulo=${encodeURIComponent(nuevo.titulo)}&invitados=${encodeURIComponent(nuevo.invitados.join(', '))}`;
+        const msj = `¡Hola *${nuevo.titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${linkPersonalizado}`;
 
-        window.open(tel ? `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+        window.open(nuevo.telefono ? `https://api.whatsapp.com/send?phone=${nuevo.telefono}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    // =========================================================================
+    // SISTEMA DE CHECK-IN (ESCÁNER QR + MANUAL + GOOGLE SHEETS REPORT)
+    // =========================================================================
+    function reproducirBeepCheckIn() {
+        try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.setValueAtTime(1174.66, ctx.currentTime + 0.08);
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.28);
+        } catch (e) {}
+    }
+
+    function formatearHoraActual() {
+        const ahora = new Date();
+        return ahora.toLocaleTimeString('es-SV', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+
+    function obtenerTodosLosAsistentesPlanos() {
+        const lista = [];
+        BASE_INVITADOS.forEach(grupo => {
+            grupo.invitados.forEach((persona, idx) => {
+                const key = obtenerClaveAsistente(grupo.titulo, persona);
+                const estado = REGISTRO_CHECKINS[key] || { checkedIn: false, timestamp: '' };
+                lista.push({
+                    idGrupo: grupo.id,
+                    tituloGrupo: grupo.titulo,
+                    telefono: grupo.telefono || '',
+                    nombreAsistente: persona,
+                    numPase: `${idx + 1}/${grupo.invitados.length}`,
+                    key: key,
+                    checkedIn: Boolean(estado.checkedIn),
+                    timestamp: estado.timestamp || '',
+                    metodo: estado.metodo || ''
+                });
+            });
+        });
+
+        // También incluir asistentes escaneados por QR de enlaces personalizados que no estaban en BASE_INVITADOS
+        Object.keys(REGISTRO_CHECKINS).forEach(key => {
+            const reg = REGISTRO_CHECKINS[key];
+            if (reg && reg.checkedIn && !lista.some(item => item.key === key)) {
+                lista.push({
+                    idGrupo: 'Extra',
+                    tituloGrupo: reg.tituloGrupo || 'Invitación Personalizada',
+                    telefono: '',
+                    nombreAsistente: reg.nombreAsistente || 'Invitado',
+                    numPase: reg.numPase || '1/1',
+                    key: key,
+                    checkedIn: true,
+                    timestamp: reg.timestamp || '',
+                    metodo: reg.metodo || 'QR'
+                });
+            }
+        });
+
+        return lista;
+    }
+
+    function registrarCheckInAsistente(tituloGrupo, nombreAsistente, numPase = '', metodo = 'QR') {
+        const key = obtenerClaveAsistente(tituloGrupo, nombreAsistente);
+        const hora = formatearHoraActual();
+
+        REGISTRO_CHECKINS[key] = {
+            checkedIn: true,
+            timestamp: hora,
+            tituloGrupo: tituloGrupo,
+            nombreAsistente: nombreAsistente,
+            numPase: numPase || '1/1',
+            metodo: metodo
+        };
+
+        guardarCheckInsEnStorage();
+        reproducirBeepCheckIn();
+        actualizarEstadisticasYListaCheckIn();
+        renderizarListaAdmin();
+
+        // Mostrar banner en el escáner
+        const banner = document.getElementById('last-scan-banner');
+        const nameEl = document.getElementById('last-scan-name');
+        const groupEl = document.getElementById('last-scan-group');
+        if (banner && nameEl && groupEl) {
+            nameEl.innerText = `✓ Check-in: ${nombreAsistente}`;
+            groupEl.innerText = `Grupo: ${tituloGrupo} • Hora: ${hora}`;
+            banner.classList.remove('hidden');
+        }
+
+        mostrarToast(`Check-in confirmado: ${nombreAsistente}`);
+    }
+
+    function alternarCheckInManual(tituloGrupo, nombreAsistente) {
+        const key = obtenerClaveAsistente(tituloGrupo, nombreAsistente);
+        const actual = REGISTRO_CHECKINS[key];
+
+        if (actual && actual.checkedIn) {
+            delete REGISTRO_CHECKINS[key];
+            guardarCheckInsEnStorage();
+            actualizarEstadisticasYListaCheckIn();
+            renderizarListaAdmin();
+            mostrarToast(`Check-in desmarcado: ${nombreAsistente}`, 'info');
+        } else {
+            registrarCheckInAsistente(tituloGrupo, nombreAsistente, '', 'Manual');
+        }
+    }
+
+    function procesarTextoQR(decodedText) {
+        if (!decodedText) return;
+        const texto = String(decodedText).trim();
+
+        // Formato esperado: 15 ANOS ELIZABETH | PASE 1/2 | ASISTENTE: Nombre | GRUPO: Titulo
+        const matchAsistente = texto.match(/ASISTENTE:\s*([^|]+)/i);
+        const matchGrupo = texto.match(/GRUPO:\s*([^|]+)/i);
+        const matchPase = texto.match(/PASE\s+([^\s|]+)/i);
+
+        if (matchAsistente) {
+            const nombreAsistente = matchAsistente[1].trim();
+            const tituloGrupo = matchGrupo ? matchGrupo[1].trim() : 'Invitado Especial';
+            const numPase = matchPase ? matchPase[1].trim() : '';
+            registrarCheckInAsistente(tituloGrupo, nombreAsistente, numPase, 'Escáner QR');
+        } else {
+            // Si es cualquier otro QR con texto de invitado
+            registrarCheckInAsistente('Pase Escaneado', texto.slice(0, 60), '1/1', 'Escáner QR');
+        }
+    }
+
+    async function toggleEscanerQR() {
+        if (scannerActivo) {
+            await detenerEscanerQR();
+            return;
+        }
+
+        const wrapper = document.getElementById('qr-reader-wrapper');
+        const btn = document.getElementById('btn-toggle-scanner');
+        wrapper.classList.remove('hidden');
+
+        try {
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+            scannerActivo = true;
+            btn.innerHTML = '<i class="fa-solid fa-stop mr-1"></i> Detener Cámara';
+            btn.className = 'bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow';
+
+            let ultimoTextoEscaneado = "";
+            let ultimoTiempo = 0;
+
+            await html5QrCode.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: { width: 210, height: 210 } },
+                (decodedText) => {
+                    const ahora = Date.now();
+                    if (decodedText === ultimoTextoEscaneado && (ahora - ultimoTiempo) < 3500) {
+                        return;
+                    }
+                    ultimoTextoEscaneado = decodedText;
+                    ultimoTiempo = ahora;
+                    procesarTextoQR(decodedText);
+                },
+                () => {}
+            );
+        } catch (err) {
+            scannerActivo = false;
+            wrapper.classList.add('hidden');
+            btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Iniciar Cámara';
+            btn.className = 'bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow';
+            mostrarToast("No se pudo acceder a la cámara. Puedes subir una imagen del QR o marcar manualmente.", "error");
+        }
+    }
+
+    async function detenerEscanerQR() {
+        const wrapper = document.getElementById('qr-reader-wrapper');
+        const btn = document.getElementById('btn-toggle-scanner');
+        if (html5QrCode && scannerActivo) {
+            try {
+                await html5QrCode.stop();
+            } catch (e) {}
+        }
+        scannerActivo = false;
+        if (wrapper) wrapper.classList.add('hidden');
+        if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-play mr-1"></i> Iniciar Cámara';
+            btn.className = 'bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow';
+        }
+    }
+
+    async function escanearArchivoQR(event) {
+        const file = event.target.files?.[0];
+        if (!file) return;
+        try {
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("qr-reader");
+            }
+            const decodedText = await html5QrCode.scanFile(file, true);
+            procesarTextoQR(decodedText);
+        } catch (err) {
+            mostrarToast("No se detectó un código QR válido en esa imagen.", "error");
+        }
+        event.target.value = '';
+    }
+
+    function setFiltroCheckIn(filtro) {
+        filtroCheckInActual = filtro;
+        const mapBtns = {
+            'all': document.getElementById('filter-all'),
+            'checked': document.getElementById('filter-checked'),
+            'pending': document.getElementById('filter-pending')
+        };
+        Object.keys(mapBtns).forEach(k => {
+            if (k === filtro) {
+                mapBtns[k].className = 'flex-1 text-[0.7rem] font-bold py-1.5 rounded-lg bg-blue-900 text-white';
+            } else {
+                mapBtns[k].className = 'flex-1 text-[0.7rem] font-bold py-1.5 rounded-lg bg-blue-50 text-blue-900 border border-blue-200';
+            }
+        });
+        renderizarListaCheckIn();
+    }
+
+    function actualizarEstadisticasYListaCheckIn() {
+        const todos = obtenerTodosLosAsistentesPlanos();
+        const confirmados = todos.filter(a => a.checkedIn).length;
+        const pendientes = todos.length - confirmados;
+
+        const elTotal = document.getElementById('stat-total-pases');
+        const elChecked = document.getElementById('stat-checked-in');
+        const elPending = document.getElementById('stat-pending');
+
+        if (elTotal) elTotal.innerText = todos.length;
+        if (elChecked) elChecked.innerText = confirmados;
+        if (elPending) elPending.innerText = pendientes;
+
+        renderizarListaCheckIn();
+    }
+
+    function renderizarListaCheckIn() {
+        const container = document.getElementById('admin-checkin-list');
+        if (!container) return;
+
+        const query = (document.getElementById('checkin-search-input')?.value || '').trim().toLowerCase();
+        const todos = obtenerTodosLosAsistentesPlanos();
+
+        const filtrados = todos.filter(item => {
+            if (filtroCheckInActual === 'checked' && !item.checkedIn) return false;
+            if (filtroCheckInActual === 'pending' && item.checkedIn) return false;
+            if (query) {
+                return item.nombreAsistente.toLowerCase().includes(query) ||
+                       item.tituloGrupo.toLowerCase().includes(query);
+            }
+            return true;
+        });
+
+        container.innerHTML = "";
+        if (filtrados.length === 0) {
+            container.innerHTML = '<p class="text-xs text-center text-blue-800/70 py-5 italic">No hay invitados en esta vista.</p>';
+            return;
+        }
+
+        filtrados.forEach(item => {
+            const safeGrupo = item.tituloGrupo.replace(/'/g, "\\'");
+            const safeNombre = item.nombreAsistente.replace(/'/g, "\\'");
+
+            container.innerHTML += `
+                <div class="p-2.5 rounded-xl border ${item.checkedIn ? 'bg-emerald-50/70 border-emerald-300' : 'bg-white border-blue-200'} flex items-center justify-between text-xs shadow-sm">
+                    <div class="pr-2 overflow-hidden">
+                        <div class="flex items-center space-x-1.5">
+                            <span class="font-bold text-blue-950 truncate">${item.nombreAsistente}</span>
+                            ${item.checkedIn ? `<span class="text-[0.6rem] bg-emerald-600 text-white px-1.5 py-0.5 rounded-full font-bold shrink-0">CHECK-IN</span>` : `<span class="text-[0.6rem] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded-full font-semibold shrink-0">Pendiente</span>`}
+                        </div>
+                        <p class="text-[0.68rem] text-blue-800 truncate">${item.idGrupo}. ${item.tituloGrupo}</p>
+                        ${item.checkedIn ? `<p class="text-[0.63rem] text-emerald-700 font-semibold mt-0.5"><i class="fa-regular fa-clock mr-1"></i>Hora: ${item.timestamp} (${item.metodo || 'Check-in'})</p>` : ''}
+                    </div>
+                    <button onclick="alternarCheckInManual('${safeGrupo}', '${safeNombre}')" class="${item.checkedIn ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 'bg-blue-50 text-blue-900 border border-blue-300 hover:bg-blue-100'} font-bold px-3 py-1.5 rounded-lg text-xs shrink-0 transition">
+                        ${item.checkedIn ? '<i class="fa-solid fa-check mr-1"></i>Listo' : 'Check-in'}
+                    </button>
+                </div>`;
+        });
+    }
+
+    // =========================================================================
+    // EXPORTACIÓN DE REPORTE A GOOGLE SHEETS (.CSV / PORTAPAPELES / APPS SCRIPT)
+    // =========================================================================
+    function exportarReporteGoogleSheets() {
+        const todos = obtenerTodosLosAsistentesPlanos();
+        const encabezados = ["ID Grupo", "Grupo / Familia", "Nombre del Invitado", "Pase", "Estado Check-in", "Hora de Llegada", "Método", "Teléfono"];
+
+        const filas = todos.map(item => [
+            item.idGrupo,
+            item.tituloGrupo,
+            item.nombreAsistente,
+            item.numPase,
+            item.checkedIn ? "CONFIRMADO (CHECK-IN)" : "PENDIENTE",
+            item.timestamp || "-",
+            item.metodo || "-",
+            item.telefono || "-"
+        ]);
+
+        const escaparCSV = (val) => `"${String(val).replace(/"/g, '""')}"`;
+        const contenidoCSV = "\uFEFF" + [encabezados.map(escaparCSV).join(","), ...filas.map(f => f.map(escaparCSV).join(","))].join("\r\n");
+
+        const blob = new Blob([contenidoCSV], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Reporte_CheckIn_15_Elizabeth_${new Date().toISOString().slice(0,10)}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        mostrarToast("Reporte .CSV descargado (listo para abrir en Google Sheets)");
+    }
+
+    function copiarTablaPortapapeles() {
+        const todos = obtenerTodosLosAsistentesPlanos();
+        const encabezados = ["ID Grupo", "Grupo / Familia", "Nombre del Invitado", "Pase", "Estado Check-in", "Hora de Llegada", "Método"];
+        const filas = todos.map(item => [
+            item.idGrupo,
+            item.tituloGrupo,
+            item.nombreAsistente,
+            item.numPase,
+            item.checkedIn ? "CONFIRMADO" : "PENDIENTE",
+            item.timestamp || "-",
+            item.metodo || "-"
+        ]);
+
+        const tsv = [encabezados.join("\t"), ...filas.map(f => f.join("\t"))].join("\n");
+        const textarea = document.createElement("textarea");
+        textarea.value = tsv;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+
+        mostrarToast("¡Tabla copiada! Pégala directamente (Ctrl+V) en una Hoja de Cálculo de Google.");
+    }
+
+    async function sincronizarCheckInsConDrive() {
+        const todos = obtenerTodosLosAsistentesPlanos();
+        mostrarToast("Enviando reporte de Check-ins a Google Drive...", "info");
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "exportCheckIns",
+                    eventTitle: "Mis 15 Años - Elizabeth",
+                    checkIns: todos
+                })
+            });
+            const data = await response.json();
+            if (data && data.sheetUrl) {
+                window.open(data.sheetUrl, '_blank');
+                mostrarToast("¡Hoja de Cálculo de Google actualizada!");
+            } else {
+                // Si el Apps Script actual solo maneja fotos, descargamos automáticamente el archivo compatible con Google Sheets
+                exportarReporteGoogleSheets();
+            }
+        } catch (err) {
+            exportarReporteGoogleSheets();
+        }
     }
 
     // =========================================================================
@@ -867,7 +1719,7 @@
         } else {
             const id = urlParams.get('id');
             if (id) {
-                const guest = BASE_INVITADOS.find(g => g.id === id);
+                const guest = BASE_INVITADOS.find(g => g.id === id) || DEFAULT_INVITADOS.find(g => g.id === id);
                 if (guest) aplicarInvitado(guest);
             } else {
                 generarQRs();
