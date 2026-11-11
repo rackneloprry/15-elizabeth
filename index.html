@@ -1038,15 +1038,30 @@
         }
     }
 
+    function codificarToken(obj) {
+        return btoa(encodeURIComponent(JSON.stringify(obj))).replace(/=+$/, '');
+    }
+
+    function decodificarToken(token) {
+        try {
+            let base64 = token + '==='.slice((token.length + 3) % 4);
+            return JSON.parse(decodeURIComponent(atob(base64)));
+        } catch (e) {
+            return null;
+        }
+    }
+
     function enviarSaaSPorId(id) {
         const todos = [...BASE_INVITADOS, ...invitadosExtra];
         const item = todos.find(g => String(g.id) === String(id));
         if (!item) return;
 
         const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
-        const link = item.esCustom
-            ? `${baseUrl}?titulo=${encodeURIComponent(item.titulo)}&invitados=${encodeURIComponent(item.invitados.join(','))}`
-            : `${baseUrl}?id=${item.id}`;
+        const token = item.esCustom
+            ? codificarToken({ t: item.titulo, i: item.invitados })
+            : codificarToken({ id: item.id });
+        const link = `${baseUrl}?p=${token}`;
+
         const msj = `¡Hola *${item.titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${link}`;
         window.open(item.telefono ? `https://api.whatsapp.com/send?phone=${item.telefono}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
     }
@@ -1079,11 +1094,12 @@
         if (tel.length === 8) tel = "503" + tel;
 
         const nuevoId = String(33 + invitadosExtra.length);
+        const listaAsistentes = invStr.split(',').map(s => s.trim()).filter(Boolean);
         const nuevoGrupo = {
             id: nuevoId,
             telefono: tel,
             titulo: titulo,
-            invitados: invStr.split(',').map(s => s.trim()).filter(Boolean),
+            invitados: listaAsistentes,
             esCustom: true
         };
         invitadosExtra.push(nuevoGrupo);
@@ -1091,7 +1107,8 @@
         renderizarListaInvitadosAdmin();
 
         const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
-        const linkPersonalizado = `${baseUrl}?titulo=${encodeURIComponent(titulo)}&invitados=${encodeURIComponent(invStr)}`;
+        const token = codificarToken({ t: titulo, i: listaAsistentes });
+        const linkPersonalizado = `${baseUrl}?p=${token}`;
         const msj = `¡Hola *${titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${linkPersonalizado}`;
 
         window.open(tel ? `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
