@@ -1,6 +1,6 @@
 const NOMBRE_CARPETA = 'Fotos_15_Eli';
+const NOMBRE_REPORTE = 'Reporte_CheckIn_15_Elizabeth';
 
-// Obtiene todas las carpetas "Fotos_15_Eli" activas (fuera de la papelera)
 function obtenerCarpetasActivas() {
   const iter = DriveApp.getFoldersByName(NOMBRE_CARPETA);
   let lista = [];
@@ -23,20 +23,50 @@ function obtenerCarpetasActivas() {
   return lista;
 }
 
-function autorizarPermisos() {
-  const carpetas = obtenerCarpetasActivas();
-  const folder = carpetas[0];
-  const temp = folder.createFile("prueba.txt", "ok");
-  temp.setTrashed(true);
-  Logger.log("✅ Conectado con éxito. Carpetas activas encontradas: " + carpetas.length);
+function obtenerHojaCheckIn() {
+  const props = PropertiesService.getScriptProperties();
+  let sheetId = props.getProperty('CHECKIN_SHEET_ID');
+  let ss = null;
+
+  if (sheetId) {
+    try {
+      ss = SpreadsheetApp.openById(sheetId);
+    } catch (e) {
+      ss = null;
+    }
+  }
+
+  if (!ss) {
+    ss = SpreadsheetApp.create(NOMBRE_REPORTE);
+    sheetId = ss.getId();
+    props.setProperty('CHECKIN_SHEET_ID', sheetId);
+    try {
+      const file = DriveApp.getFileById(sheetId);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (e) {}
+  }
+
+  let sheet = ss.getSheets()[0];
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(['Fecha y Hora', 'ID Invitación', 'Familia / Grupo', 'Nombre del Asistente', 'Pase', 'Estado']);
+    sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
+  }
+  return ss;
 }
 
-// 1. LEER FOTOS DE TODAS LAS CARPETAS "Fotos_15_Eli" ACTIVAS (doGet)
+function autorizarPermisos() {
+  const carpetas = obtenerCarpetasActivas();
+  const ss = obtenerHojaCheckIn();
+  Logger.log("✅ Permisos listos. Hoja de Check-In: " + ss.getUrl());
+}
+
 function doGet(e) {
   try {
     const props = PropertiesService.getScriptProperties();
     const galleryActive = props.getProperty('GALLERY_ACTIVE') !== 'false';
-    const pinnedIds = JSON.parse(props.getProperty('PINNED_IDS') || '[]');
+    const checkIns = JSON.parse(props.getProperty('CHECKINS_DATA') || '{}');
+    const sheetId = props.getProperty('CHECKIN_SHEET_ID');
+    const sheetUrl = sheetId ? ("https://docs.google.com/spreadsheets/d/" + sheetId + "/edit") : "";
 
     const carpetas = obtenerCarpetasActivas();
     let photos = [];
@@ -57,8 +87,7 @@ function doGet(e) {
           photos.push({
             id: id,
             url: "https://drive.google.com/thumbnail?id=" + id + "&sz=w1000",
-            date: file.getDateCreated().getTime(),
-            pinned: pinnedIds.indexOf(id) !== -1
+            date: file.getDateCreated().getTime()
           });
         }
       }
@@ -70,7 +99,8 @@ function doGet(e) {
       success: true,
       galleryActive: galleryActive,
       folderUrl: carpetas[0].getUrl(),
-      photos: photos.slice(0, 50),
+      sheetUrl: sheetUrl,
+      checkIns: checkIns,
       urls: photos.slice(0, 50).map(function(p) { return p.url; })
     })).setMimeType(ContentService.MimeType.JSON);
 
@@ -78,18 +108,74 @@ function doGet(e) {
     return ContentService.createTextOutput(JSON.stringify({
       success: false,
       error: error.toString(),
-      photos: [],
       urls: []
     })).setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// 2. SUBIR, ELIMINAR, FIJAR O ACTIVAR/DESACTIVAR EL ÁLBUM (doPost)
 function doPost(e) {
   try {
     const data = JSON.parse(e.postData.contents);
     const props = PropertiesService.getScriptProperties();
     const action = data.action || 'upload';
+
+    if (action === 'checkIn') {
+      let checkIns = JSON.parse(props.getProperty('CHECKINS_DATA') || '{}');
+      const key = data.key;
+      const timestamp = data.timestamp || new Date().toLocaleString('es-SV');
+
+      if (data.checked === false) {
+        delete checkIns[key];
+      } else {
+        checkIns[key] = {
+          grupoId: data.grupoId || '-',
+          grupo: data.grupo || '',
+          asistente: data.asistente || '',
+          pase: data.pase || '1/1',
+          hora: timestamp,
+          estado: 'Check-In Confirmado'
+        };
+      }
+      props.setProperty('CHECKINS_DATA', JSON.stringify(checkIns));
+
+      const ss = obtenerHojaCheckIn();
+      const sheet = ss.getSheets()[0];
+      sheet.clearContents();
+      sheet.appendRow(['Fecha y Hora', 'ID Invitación', 'Familia / Grupo', 'Nombre del Asistente', 'Pase', 'Estado']);
+      sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
+
+      const keys = Object.keys(checkIns);
+      for (let i = 0; i < keys.length; i++) {
+        let item = checkIns[keys[i]];
+        sheet.appendRow([item.hora, item.grupoId, item.grupo, item.asistente, item.pase, item.estado]);
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        sheetUrl: ss.getUrl(),
+        checkIns: checkIns
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (action === 'syncSheet') {
+      const ss = obtenerHojaCheckIn();
+      const sheet = ss.getSheets()[0];
+      sheet.clearContents();
+      sheet.appendRow(['Fecha y Hora', 'ID Invitación', 'Familia / Grupo', 'Nombre del Asistente', 'Pase', 'Estado']);
+      sheet.getRange(1, 1, 1, 6).setFontWeight('bold');
+
+      if (Array.isArray(data.rows)) {
+        for (let i = 0; i < data.rows.length; i++) {
+          let r = data.rows[i];
+          sheet.appendRow([r.hora, r.grupoId, r.grupo, r.asistente, r.pase, r.estado]);
+        }
+      }
+
+      return ContentService.createTextOutput(JSON.stringify({
+        success: true,
+        sheetUrl: ss.getUrl()
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
 
     if (action === 'toggleGallery') {
       props.setProperty('GALLERY_ACTIVE', data.active ? 'true' : 'false');
@@ -102,25 +188,8 @@ function doPost(e) {
     if (action === 'delete' && data.fileId) {
       const file = DriveApp.getFileById(data.fileId);
       file.setTrashed(true);
-      let pinnedIds = JSON.parse(props.getProperty('PINNED_IDS') || '[]');
-      pinnedIds = pinnedIds.filter(function(id) { return id !== data.fileId; });
-      props.setProperty('PINNED_IDS', JSON.stringify(pinnedIds));
       return ContentService.createTextOutput(JSON.stringify({ success: true }))
         .setMimeType(ContentService.MimeType.JSON);
-    }
-
-    if (action === 'togglePin' && data.fileId) {
-      let pinnedIds = JSON.parse(props.getProperty('PINNED_IDS') || '[]');
-      if (pinnedIds.indexOf(data.fileId) !== -1) {
-        pinnedIds = pinnedIds.filter(function(id) { return id !== data.fileId; });
-      } else if (pinnedIds.length < 6) {
-        pinnedIds.push(data.fileId);
-      }
-      props.setProperty('PINNED_IDS', JSON.stringify(pinnedIds));
-      return ContentService.createTextOutput(JSON.stringify({
-        success: true,
-        pinnedIds: pinnedIds
-      })).setMimeType(ContentService.MimeType.JSON);
     }
 
     const carpetas = obtenerCarpetasActivas();
