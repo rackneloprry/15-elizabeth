@@ -248,4 +248,1275 @@
                         <i class="fa-brands fa-whatsapp text-green-400 text-base mr-1.5"></i> Guardar y Enviar
                     </button>
                     <button onclick="probarCustomEnPantalla()" class="bg-blue-100 text-blue-900 border border-blue-300 text-xs font-bold px-3 py-2 rounded-lg hover:bg-blue-200" title="Previsualizar">
-                        <i class="fa-solid fa-eye text-blue-90
+                        <i class="fa-solid fa-eye text-blue-900"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. LISTA OFICIAL DE INVITADOS (CON CHECK-IN Y OPCIÓN DE ELIMINAR INVITACIÓN) -->
+            <div class="flex items-center justify-between mb-2">
+                <p class="text-xs font-bold text-blue-900 uppercase"><i class="fa-solid fa-users mr-1 text-blue-900"></i> Lista de Invitaciones:</p>
+                <button onclick="restaurarInvitadosEliminados()" class="text-[0.65rem] text-blue-800 underline">Restaurar eliminados</button>
+            </div>
+            <div id="admin-guest-list" class="space-y-2.5 max-h-80 overflow-y-auto pr-1 hide-scrollbar"></div>
+        </div>
+    </div>
+
+    <!-- ================= PANTALLA DE BIENVENIDA (SOBRE VIRTUAL) ================= -->
+    <div id="invitation-overlay" class="absolute top-0 left-0 w-full h-full z-50 transition-opacity duration-500 bg-white">
+        <div class="sticky top-0 w-full h-screen flex flex-col items-center justify-center bg-section-1 px-4">
+            <div class="glass-panel p-7 flex flex-col items-center justify-center text-center shadow-xl border border-white/60 w-full max-w-sm">
+                
+                <!-- Toca 8 veces seguidas el título para entrar al Admin -->
+                <h2 onclick="toqueSecretoAdmin()" class="font-script text-5xl text-blue-900 mb-1 select-none cursor-pointer">Mis 15 Años</h2>
+                <p onclick="toqueSecretoAdmin()" class="font-script text-4xl text-blue-800 mb-5 select-none cursor-pointer">Elizabeth</p>
+
+                <!-- BIENVENIDA PERSONALIZADA AUTOMÁTICA -->
+                <div id="guest-info-container" class="hidden flex-col items-center mb-6 w-full bg-blue-950/5 border border-blue-900/20 rounded-xl p-4">
+                    <p class="text-[0.65rem] uppercase tracking-widest text-blue-900 font-bold">¡Bienvenidos! Invitación especial para:</p>
+                    <p id="guest-name-display" class="font-script text-3xl text-blue-900 leading-tight text-center my-1.5">Invitado Especial</p>
+                    <div class="flex items-center justify-center mt-1">
+                        <span class="bg-blue-900 text-white text-xs font-bold px-3.5 py-0.5 rounded-full">
+                            <i class="fa-solid fa-ticket mr-1 text-white"></i> Pases reservados: <span id="guest-passes-display">1</span>
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- BOTÓN ABRIR INVITACIÓN -->
+                <div class="relative inline-flex items-center justify-center mt-1">
+                    <button type="button" onclick="abrirInvitacion();" class="bg-blue-900 text-white px-7 py-3 rounded-full font-bold shadow-lg flex items-center space-x-2 animate-bounce cursor-pointer hover:bg-blue-800 transition">
+                        <i class="fa-regular fa-envelope-open text-xl text-white"></i>
+                        <span class="text-sm tracking-wider uppercase text-white">Abrir Invitación</span>
+                    </button>
+                    <!-- Reproductor invisible para desbloquear audio en móviles -->
+                    <div id="yt-click-catcher" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 220px; height: 56px; overflow: hidden; opacity: 0.001; z-index: 60; cursor: pointer;">
+                        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 280px; height: 200px;">
+                            <iframe id="youtube-player" width="280" height="200" src="https://www.youtube.com/embed/sfYbUHWPyBw?enablejsapi=1&playsinline=1&controls=0&rel=0&loop=1&playlist=sfYbUHWPyBw" frameborder="0" allow="autoplay; encrypted-media"></iframe>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-[0.7rem] text-blue-900 mt-3 italic opacity-80">Toca el botón para abrir tu invitación</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= SECCIÓN 1: PORTADA (SIN BLUR DE FONDO EN EL TEXTO) ================= -->
+    <section class="bg-section-1 min-h-screen relative flex flex-col items-center justify-evenly py-10 px-6">
+        
+        <!-- Bloque 1: Título Principal -->
+        <div class="w-full relative flex flex-col items-center pt-2">
+            <div onclick="toqueSecretoAdmin()" class="relative flex items-center justify-center w-full cursor-pointer select-none">
+                <span class="font-script text-5xl text-blue-900 absolute left-8 top-2">Mis</span>
+                <span class="font-script text-[10.5rem] leading-none text-blue-900">15</span>
+            </div>
+            <div class="flex items-center justify-center -mt-6 z-10">
+                <span class="font-script text-5xl text-blue-900">Años</span>
+            </div>
+            <div class="font-script text-[4.8rem] text-blue-900 text-center -mt-2 leading-tight">Elizabeth</div>
+        </div>
+
+        <!-- Bloque 2: Texto de Acción de Gracias sin blur -->
+        <div class="w-full max-w-xs mx-auto text-center z-10 relative my-2 px-4 py-4">
+            <!-- Ornamento superior minimalista fine-line -->
+            <div class="flex items-center justify-center space-x-2.5 mb-3 opacity-80">
+                <span class="w-12 h-[1px] bg-blue-900/40"></span>
+                <svg class="w-4 h-4 text-blue-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M12 3L14.2 9.8L21 12L14.2 14.2L12 21L9.8 14.2L3 12L9.8 9.8L12 3Z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="w-12 h-[1px] bg-blue-900/40"></span>
+            </div>
+
+            <p class="text-[1.05rem] font-semibold text-blue-900 italic leading-[1.95] tracking-wide">
+                Hace 15 años Dios me concedió<br>
+                la vida y doy fe de su fidelidad<br>
+                y amor, teniendo la certeza<br>
+                que el siempre estará conmigo<br>
+                bendiciendo mi vida,<br>
+                con Acción de Gracias<br>
+                quiero celebrar mis 15 años.
+            </p>
+
+            <!-- Ornamento inferior minimalista fine-line -->
+            <div class="flex items-center justify-center space-x-2.5 mt-3 opacity-80">
+                <span class="w-12 h-[1px] bg-blue-900/40"></span>
+                <svg class="w-4 h-4 text-blue-900" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                    <path d="M12 3L14.2 9.8L21 12L14.2 14.2L12 21L9.8 14.2L3 12L9.8 9.8L12 3Z" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="w-12 h-[1px] bg-blue-900/40"></span>
+            </div>
+        </div>
+
+        <!-- Bloque 3: Indicador sutil inferior -->
+        <div class="flex flex-col items-center justify-center opacity-75 pb-1">
+            <span class="text-[0.65rem] uppercase tracking-[0.25em] text-blue-900 font-bold mb-1">Desliza</span>
+            <svg class="w-5 h-5 text-blue-900 animate-bounce" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
+                <path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </section>
+
+    <!-- ================= SECCIÓN 2: FECHA Y CONTADOR ================= -->
+    <section class="bg-section-2 min-h-screen relative flex flex-col items-center py-12 px-6">
+        <div class="relative mt-4">
+            <div class="w-56 h-72 rounded-t-full rounded-b-md overflow-hidden border-4 border-white shadow-lg relative z-10">
+                <img src="https://lh3.googleusercontent.com/d/1vCMQCZItN4-nKu0GQzKOOojfCsNL1E5r" alt="Elizabeth" class="w-full h-full object-cover">
+            </div>
+            <img src="https://i.postimg.cc/5ypCrwv8/15-anos-Eli-(1440-x-3088-px)-(4).png" alt="Mariposa azul" class="absolute -top-4 -right-6 w-16 h-16 object-contain z-20 drop-shadow-md">
+        </div>
+        
+        <img src="https://i.postimg.cc/XYPw3chV/15-anos-Eli-(1440-x-3088-px)-(3).png" alt="Divisor floral" class="w-64 h-auto object-contain mt-3 mb-4 z-20">
+
+        <p class="text-center text-[0.95rem] font-semibold text-blue-900 italic mb-5 leading-relaxed">
+            Es mi deseo y el de mi familia<br>
+            que compartan conmigo<br>
+            este día tan especial.
+        </p>
+
+        <p class="text-xs font-bold text-blue-900 uppercase tracking-widest mb-1">Reserva la fecha:</p>
+        
+        <div class="flex items-end justify-center w-full">
+            <span class="font-script text-4xl text-blue-900 mb-3">Domingo</span>
+            <span class="font-script text-[6.5rem] leading-none text-blue-900 mx-3">13</span>
+            <span class="font-script text-4xl text-blue-900 mb-3">Diciembre</span>
+        </div>
+        
+        <div class="flex items-center justify-center -mt-2 mb-2 w-full">
+            <img src="https://i.postimg.cc/8CB0pYNW/15-anos-Eli-1440-x-3088-px-1-removebg-preview.png" alt="Adorno izquierdo" class="w-20 h-auto object-contain">
+            <span class="text-xl text-blue-900 font-bold italic mx-2">2026</span>
+            <img src="https://i.postimg.cc/kXnNy58y/15-anos-Eli-(1440-x-3088-px)-(2).png" alt="Adorno derecho" class="w-20 h-auto object-contain">
+        </div>
+        
+        <p class="text-sm font-bold text-blue-900 mt-1">Hora: 10:00am</p>
+
+        <!-- TEXTO "FALTAN" ARRIBA DE LA CUENTA REGRESIVA -->
+        <p class="font-script text-4xl text-blue-900 mt-5 mb-1">Faltan</p>
+
+        <div class="glass-panel w-full p-4 flex justify-around items-start">
+            <div class="countdown-box"><span class="countdown-number" id="days">00</span><span class="countdown-label">Días</span></div>
+            <span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="hours">00</span><span class="countdown-label">Horas</span></div>
+            <span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="minutes">00</span><span class="countdown-label">Minutos</span></div>
+            <span class="countdown-separator">:</span>
+            <div class="countdown-box"><span class="countdown-number" id="seconds">00</span><span class="countdown-label">Segundos</span></div>
+        </div>
+    </section>
+
+    <!-- ================= SECCIÓN 3: RECEPCIÓN, CONFIRMACIÓN, QR Y ÁLBUM EN VIVO ================= -->
+    <section class="bg-section-3 min-h-screen relative flex flex-col items-center py-12 px-5 overflow-hidden">
+        
+        <img src="https://i.postimg.cc/k5cRGQ1k/15-anos-Eli-(Sitio-web)-(3).png" alt="Palmera" class="absolute -top-2 -right-4 w-32 h-auto object-contain z-0 opacity-90 pointer-events-none">
+        <img src="https://i.postimg.cc/vHJVNH6R/15-anos-Eli-(Sitio-web)-(4).png" alt="Flor de hibisco" class="absolute top-4 -left-6 w-28 h-auto object-contain z-0 opacity-90 pointer-events-none rotate-[-15deg]">
+
+        <!-- UBICACIÓN CON ICONOS MINIMALISTAS FINE-LINE SIN RELLENO -->
+        <div class="text-center mb-6 mt-2 relative z-10">
+            <div class="flex items-center justify-center space-x-3 mb-2">
+                <!-- Icono Fine-Line Izquierdo: Pin Minimalista sin relleno -->
+                <svg class="w-7 h-7 text-blue-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21c-4.5-4.8-7-8.2-7-11.2A7 7 0 0 1 19 9.8c0 3-2.5 6.4-7 11.2z"/>
+                    <circle cx="12" cy="9.5" r="2.3"/>
+                </svg>
+
+                <h3 class="font-script text-5xl text-blue-900">Recepción:</h3>
+
+                <!-- Icono Fine-Line Derecho: Copas / Celebración Minimalista sin relleno -->
+                <svg class="w-7 h-7 text-blue-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8 22h8"/>
+                    <path d="M12 15v7"/>
+                    <path d="M12 15a5 5 0 0 0 5-5c0-2-.5-4-2-8H9c-1.5 4-2 6-2 8a5 5 0 0 0 5 5Z"/>
+                </svg>
+            </div>
+
+            <div class="flex items-center justify-center text-blue-900 mb-1">
+                <!-- Icono de Ubicación Fine-Line sin relleno -->
+                <svg class="w-6 h-6 mr-2.5 text-blue-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 21c-4.5-4.8-7-8.2-7-11.2A7 7 0 0 1 19 9.8c0 3-2.5 6.4-7 11.2z"/>
+                    <circle cx="12" cy="9.5" r="2.3"/>
+                </svg>
+                <p class="text-[0.95rem] font-semibold italic leading-tight">Rancho La Sagrada Familia,<br>Playa San Diego.</p>
+            </div>
+            
+            <div class="flex items-center justify-center space-x-3 mt-4">
+                <a href="https://maps.app.goo.gl/kvcyPASZp8dUfoW48?g_st=ac" target="_blank" class="bg-blue-900 text-white border border-white/40 px-4 py-2 rounded-full font-bold text-xs flex items-center shadow-sm transition hover:bg-blue-800">
+                    <i class="fa-solid fa-map-location-dot text-white mr-2 text-base"></i> Maps
+                </a>
+                <a href="https://waze.com/ul?q=Rancho+La+Sagrada+Familia,+Playa+San+Diego" target="_blank" class="bg-white border border-blue-300 text-blue-900 px-4 py-2 rounded-full font-bold text-xs flex items-center shadow-sm transition hover:bg-blue-50">
+                    <i class="fa-brands fa-waze text-blue-900 mr-2 text-base"></i> Waze
+                </a>
+            </div>
+        </div>
+
+        <!-- VESTIMENTA CON ICONOS MINIMALISTAS FINE-LINE SIN RELLENO -->
+        <div class="text-center mb-6 w-full relative z-10">
+            <div class="flex items-center justify-center space-x-3 mb-2">
+                <!-- Camisa / Traje Fine-Line sin relleno -->
+                <svg class="w-8 h-8 text-blue-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M8.5 4L12 7.2L15.5 4L20.5 6.8L18.5 11L16 9.8V20H8V9.8L5.5 11L3.5 6.8L8.5 4Z"/>
+                    <path d="M12 7.2V20"/>
+                </svg>
+
+                <h3 class="font-script text-4xl text-blue-900">Código de Vestimenta:</h3>
+
+                <!-- Vestido Fine-Line sin relleno -->
+                <svg class="w-8 h-8 text-blue-900 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9.5 4L12 6.5L14.5 4"/>
+                    <path d="M9.5 4L8 9.5L10 11.5L6.5 20H17.5L14 11.5L16 9.5L14.5 4"/>
+                    <path d="M10 11.5H14"/>
+                </svg>
+            </div>
+            <p class="text-[0.95rem] font-bold text-blue-900 italic">Casual de Playa en blanco.</p>
+            <p class="text-xs text-blue-900 mt-1 font-semibold italic">Nota: se reserva color AZUL para Quinceañera.</p>
+        </div>
+
+        <!-- ================= SECCIÓN DE CONFIRMACIÓN (ANTES DEL 30) ================= -->
+        <div class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Confirmar Asistencia</h3>
+            <p class="text-xs font-bold text-blue-900 mb-3 bg-white/90 py-1.5 px-4 rounded-full inline-block border border-blue-200 shadow-sm">
+                <i class="fa-regular fa-calendar-check mr-1 text-blue-900"></i> Por favor confirmar antes del 30 de Noviembre
+            </p>
+
+            <!-- Cabecera del Grupo -->
+            <div id="rsvp-guest-header" class="hidden mb-3 bg-blue-900 text-white py-2 px-4 rounded-xl shadow-sm">
+                <p class="text-[0.65rem] uppercase tracking-widest opacity-80">Invitación exclusiva para:</p>
+                <p id="rsvp-guest-title" class="font-bold text-sm"></p>
+            </div>
+
+            <!-- Casillas Dinámicas -->
+            <div id="rsvp-dynamic-form" class="text-left w-full mb-5 hidden">
+                <p class="text-xs font-bold text-blue-900 mb-2 uppercase tracking-wide">
+                    <i class="fa-regular fa-square-check mr-1 text-blue-900"></i> Selecciona quiénes asistirán:
+                </p>
+                <div id="checkbox-list" class="flex flex-col space-y-2" onchange="generarQRs()"></div>
+            </div>
+
+            <!-- Botón de Confirmación -->
+            <button type="button" onclick="enviarConfirmacionWhatsApp()" class="w-full bg-blue-900 text-white font-bold text-sm px-6 py-3 rounded-full inline-flex items-center justify-center shadow-md hover:bg-blue-800 transition cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-green-400 text-2xl mr-2"></i> Confirmar por WhatsApp
+            </button>
+        </div>
+
+        <!-- ================= CARRUSEL DE PASES QR ================= -->
+        <div id="pass-qr-section" class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Tus Pases QR</h3>
+            <p id="qr-swipe-hint" class="text-[0.68rem] text-blue-900 mb-3 font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-arrows-left-right mr-1 text-blue-900"></i> Desliza de derecha a izquierda para ver cada pase
+            </p>
+
+            <div class="relative w-full">
+                <div id="qr-carousel" class="flex overflow-x-auto snap-x snap-mandatory space-x-3 pb-2 w-full hide-scrollbar scroll-smooth"></div>
+                <div id="qr-dots" class="flex justify-center space-x-1.5 mt-2"></div>
+            </div>
+        </div>
+
+        <!-- ================= SECCIÓN 4: GALERÍA DE 6 FOTOS EN VIVO (REEL DE SLIDES) ================= -->
+        <div id="galeria-en-vivo" class="glass-panel text-center mb-6 p-5 w-full relative z-10 border border-blue-900/15">
+            <i class="fa-solid fa-camera-retro text-3xl text-blue-900 mb-1"></i>
+            <h3 class="font-script text-4xl text-blue-900 mb-1">Álbum en Vivo</h3>
+            <p class="text-xs text-blue-900 mb-3 font-semibold leading-relaxed">
+                ¡Comparte tus fotos de la celebración! Las últimas 6 fotos aparecen en este reel en tiempo real.
+            </p>
+            
+            <!-- Reel Deslizable de 6 Fotos -->
+            <div class="relative w-full">
+                <div id="gallery-container" class="flex overflow-x-auto snap-x snap-mandatory space-x-3 pb-3 mb-2 w-full hide-scrollbar scroll-smooth min-h-[16rem] items-center">
+                    <p class="text-xs text-blue-900 w-full animate-pulse my-10">
+                        Conectando con el álbum en vivo... <i class="fa-solid fa-spinner fa-spin ml-1 text-blue-900"></i>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Botones para Subir Foto al Drive y Ver Álbum Completo -->
+            <div class="flex flex-col space-y-2.5 mt-2">
+                <input type="file" id="foto-upload" accept="image/*" class="hidden" onchange="subirFotoDrive()">
+                <label id="upload-btn-label" for="foto-upload" class="bg-blue-900 text-white font-bold text-xs px-5 py-3 rounded-full inline-flex items-center justify-center shadow-md hover:bg-blue-800 transition cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-up mr-2 text-white text-base"></i> Tomar / Subir una Foto al Álbum
+                </label>
+                <button type="button" onclick="abrirGaleriaCompleta()" class="bg-white text-blue-900 border border-blue-300 font-bold text-xs px-5 py-2.5 rounded-full inline-flex items-center justify-center shadow-sm hover:bg-blue-50 transition cursor-pointer">
+                    <i class="fa-regular fa-images mr-2 text-blue-900"></i> Ver Álbum Completo (<span id="album-count-badge">0</span>)
+                </button>
+            </div>
+            <p id="upload-status" class="text-xs font-bold mt-3 hidden transition-all"></p>
+        </div>
+
+        <!-- FOTO CIRCULAR Y CIERRE -->
+        <div class="relative my-4 flex justify-center items-center w-64 h-64 mx-auto z-10">
+            <div class="w-44 h-44 rounded-full overflow-hidden shadow-md relative z-10">
+                <img src="https://lh3.googleusercontent.com/d/1M5UZHbMauuSwvckpp_kEq9Y6Ty_WIU0K" alt="Elizabeth" class="w-full h-full object-cover">
+            </div>
+            <img src="https://i.postimg.cc/3wpDhMm4/15-anos-Eli-(1440-x-3088-px)-(5).png" alt="Corona de flores" class="absolute inset-0 w-full h-full object-contain z-20 scale-110 pointer-events-none">
+        </div>
+
+        <div class="relative w-full mt-4 pt-2 pb-6 flex flex-col items-center z-10">
+            <img src="https://i.postimg.cc/mrN2VT7w/15-anos-Eli-(1440-x-3088-px)-(7).png" alt="Caracol marino" class="absolute -left-6 bottom-6 w-20 h-20 object-contain z-10 opacity-90">
+            <img src="https://i.postimg.cc/c4rCZyNH/15-anos-Eli-(1440-x-3088-px)-(6).png" alt="Concha marina" class="absolute left-4 -bottom-2 w-16 h-16 object-contain z-10 opacity-90">
+            <img src="https://i.postimg.cc/VLxf8JRC/15-anos-Eli-(1440-x-3088-px)-(8).png" alt="Estrella de mar azul" class="absolute left-12 bottom-6 w-14 h-14 object-contain z-10 opacity-85">
+
+            <div class="flex items-center justify-center space-x-3 mb-6 relative z-20 px-4">
+                <i class="fa-regular fa-envelope text-3xl text-blue-900"></i>
+                <p class="text-sm font-semibold text-blue-900 italic leading-tight">
+                    Tu presencia es lo mas importante.<br> Pero si quieres tener un detalle especial<br> Apreciaré sus muestras de<br>cariño en regalo de sobre o tradicional.
+                </p>
+            </div>
+
+            <div class="font-script text-5xl text-blue-900 relative z-20">Te Esperamos!</div>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // =========================================================================
+    // CONFIGURACIÓN PRINCIPAL: DESTINO DE CONFIRMACIONES (VERÓNICA RAMOS)
+    // =========================================================================
+    const NUMERO_WHATSAPP_RECEPCION = "50377032658";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwu5CM81cFCHa3uAz8gLBC1DHdNBGQ9o0c405qdr_DZzM4EL_7iM-vL9bzuirlV6xHscw/exec";
+
+    // BASE DE DATOS DE INVITADOS (ID 1 AL 32)
+    const BASE_INVITADOS = [
+        {"id": "1", "telefono": "50373442196", "titulo": "Elizabeth Carranza", "invitados": ["Elizabeth Carranza"]},
+        {"id": "2", "telefono": "50378588333", "titulo": "María Caballero", "invitados": ["María Caballero"]},
+        {"id": "3", "telefono": "50361694886", "titulo": "David López y Abuela Raymunda", "invitados": ["David López", "Abuela Raymunda Portillo"]},
+        {"id": "4", "telefono": "50376962219", "titulo": "Iris López", "invitados": ["Iris López"]},
+        {"id": "5", "telefono": "50370935771", "titulo": "Meylin López", "invitados": ["Meylin López"]},
+        {"id": "6", "telefono": "50377032658", "titulo": "Vero Ramos", "invitados": ["Vero Ramos"]},
+        {"id": "7", "telefono": "50371619502", "titulo": "Steven Mendoza", "invitados": ["Steven Mendoza"]},
+        {"id": "8", "telefono": "50374967962", "titulo": "Dinora de Lemus y Familia", "invitados": ["Dinora de Lemus", "Federico Lemus", "Estefani Lemus", "Cristian Arana"]},
+        {"id": "9", "telefono": "50375849105", "titulo": "Karla Arana", "invitados": ["Karla Arana"]},
+        {"id": "10", "telefono": "50370019613", "titulo": "Carlos Carranza y Familia", "invitados": ["Carlos Carranza", "Adela Carranza", "Jenny", "Mamá de Jenny", "Fer Carranza"]},
+        {"id": "11", "telefono": "50378939854", "titulo": "Familia Calderón Carranza", "invitados": ["Sandra Carranza", "David Calderón", "Alison Carranza", "Jeferzon Carranza"]},
+        {"id": "12", "telefono": "50373440497", "titulo": "Familia Orellana López", "invitados": ["Sandra López", "Jorge Orellana", "Sarai Orellana", "Daniel Orellana"]},
+        {"id": "13", "telefono": "50377607428", "titulo": "Laura Portillo", "invitados": ["Laura Portillo"]},
+        {"id": "14", "telefono": "50378166578", "titulo": "Jorge Ramírez", "invitados": ["Jorge Ramírez"]},
+        {"id": "15", "telefono": "50377703391", "titulo": "Enrrique Ramírez y Acompañante", "invitados": ["Enrrique Ramírez", "Acompañante (+1)"]},
+        {"id": "16", "telefono": "50362083008", "titulo": "Ezequiel Ramírez y Acompañante", "invitados": ["Ezequiel Ramírez", "Acompañante (+1)"]},
+        {"id": "17", "telefono": "50376049543", "titulo": "José Portillo y Martha de Portillo", "invitados": ["José Portillo", "Martha de Portillo"]},
+        {"id": "18", "telefono": "50377313498", "titulo": "Jesica Portillo", "invitados": ["Jesica Portillo"]},
+        {"id": "19", "telefono": "50375779596", "titulo": "Marjory Portillo, Pamela y Acompañante", "invitados": ["Marjory Portillo", "Acompañante (+1)", "Pamela Portillo"]},
+        {"id": "20", "telefono": "50375496209", "titulo": "Lowell Portillo y Acompañante", "invitados": ["Lowell Portillo", "Acompañante (+1)"]},
+        {"id": "21", "telefono": "50369789566", "titulo": "Familia Rivas Portillo", "invitados": ["Georgina Portillo", "Sergio Rivas", "Leilani Rivas"]},
+        {"id": "22", "telefono": "50372287882", "titulo": "Cristina Corvera y Acompañante", "invitados": ["Cristina Corvera", "Acompañante (+1)"]},
+        {"id": "23", "telefono": "50377226794", "titulo": "Carmen González y Acompañante", "invitados": ["Carmen González", "Acompañante (+1)"]},
+        {"id": "24", "telefono": "50376709902", "titulo": "Stefani Belloso", "invitados": ["Stefani Belloso"]},
+        {"id": "25", "telefono": "50371574798", "titulo": "Sarai Hernández y Mamá", "invitados": ["Sarai Hernández", "Mamá de Sara"]},
+        {"id": "26", "telefono": "50378744430", "titulo": "Licda. Marlen Campos y Acompañante", "invitados": ["Licda. Marlen Campos", "Acompañante (+1)"]},
+        {"id": "27", "telefono": "50377242485", "titulo": "Rosario", "invitados": ["Rosario"]},
+        {"id": "28", "telefono": "50370119122", "titulo": "Alexis", "invitados": ["Alexis"]},
+        {"id": "29", "telefono": "", "titulo": "Joselin Dayana Medina y Mamá", "invitados": ["Joselin Dayana Medina", "Mamá de Joseline"]},
+        {"id": "30", "telefono": "50371740484", "titulo": "Reyna Ramos", "invitados": ["Reyna Ramos"]},
+        {"id": "31", "telefono": "50375505334", "titulo": "Yesenia Rafailano, Adam Ramos y Acompañante", "invitados": ["Yesenia Rafailano", "Adam Ramos", "Acompañante (+1)"]},
+        {"id": "32", "telefono": "50370019613", "titulo": "Arely Lemus Sanches e Hijo", "invitados": ["Arely Lemus Sanches", "Hijo de Arely"]}
+    ];
+
+    let invitadoActual = null;
+    let toquesAdmin = 0, timerToques = null;
+    let fotosRecibidasDrive = [];
+    let galeriaActiva = localStorage.getItem('eli_gallery_active') !== 'false';
+    let checkInsMap = JSON.parse(localStorage.getItem('eli_checkins_map') || "{}");
+    let invitadosEliminados = JSON.parse(localStorage.getItem('eli_deleted_guests') || "[]");
+    let invitadosExtra = JSON.parse(localStorage.getItem('eli_extra_guests') || "[]");
+    let googleSheetUrl = localStorage.getItem('eli_sheet_url') || "";
+    let html5QrScanner = null;
+
+    function obtenerListaInvitadosActivos() {
+        const todos = [...BASE_INVITADOS, ...invitadosExtra];
+        return todos.filter(item => !invitadosEliminados.includes(String(item.id)));
+    }
+
+    function toqueSecretoAdmin() {
+        toquesAdmin++;
+        clearTimeout(timerToques);
+        if (toquesAdmin >= 8) {
+            toquesAdmin = 0;
+            abrirAdmin();
+        } else {
+            timerToques = setTimeout(() => { toquesAdmin = 0; }, 1800);
+        }
+    }
+
+    function aplicarInvitado(datos) {
+        invitadoActual = datos;
+
+        const infoContainer = document.getElementById('guest-info-container');
+        infoContainer.classList.remove('hidden');
+        infoContainer.classList.add('flex');
+        document.getElementById('guest-name-display').innerText = datos.titulo;
+        document.getElementById('guest-passes-display').innerText = datos.invitados.length;
+
+        document.getElementById('rsvp-guest-header').classList.remove('hidden');
+        document.getElementById('rsvp-guest-title').innerText = datos.titulo;
+
+        const rsvpForm = document.getElementById('rsvp-dynamic-form');
+        const rsvpList = document.getElementById('checkbox-list');
+        rsvpForm.classList.remove('hidden');
+        rsvpList.innerHTML = "";
+
+        datos.invitados.forEach((persona, idx) => {
+            rsvpList.innerHTML += `
+                <label class="checkbox-label">
+                    <input type="checkbox" id="chk-${idx}" value="${persona}" checked class="checkbox-custom">
+                    <span>${persona}</span>
+                </label>`;
+        });
+
+        generarQRs();
+
+        // Oculta el parámetro ?p=... de la barra de direcciones apenas carga el invitado
+        if (window.history && window.history.replaceState) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+
+    function generarQRs() {
+        const qrContainer = document.getElementById('qr-carousel');
+        const qrDots = document.getElementById('qr-dots');
+        qrContainer.innerHTML = "";
+        qrDots.innerHTML = "";
+
+        if (!invitadoActual) {
+            qrContainer.innerHTML = '<p class="text-xs text-blue-900 mx-auto py-6 italic">Abre tu enlace personalizado para visualizar tus códigos QR.</p>';
+            return;
+        }
+
+        const marcados = Array.from(document.querySelectorAll('#checkbox-list input:checked')).map(cb => cb.value);
+
+        if (marcados.length === 0) {
+            qrContainer.innerHTML = '<p class="text-xs font-bold text-blue-900 mx-auto py-6">Selecciona al menos 1 asistente en la lista de arriba para generar su QR.</p>';
+            return;
+        }
+
+        marcados.forEach((nombreAsistente, index) => {
+            const numPase = index + 1;
+            const total = marcados.length;
+            const textoQR = `15 ANOS ELIZABETH | ID: ${invitadoActual.id || '-'} | PASE ${numPase}/${total} | ASISTENTE: ${nombreAsistente} | GRUPO: ${invitadoActual.titulo}`;
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&color=172554&data=${encodeURIComponent(textoQR)}`;
+
+            qrContainer.innerHTML += `
+                <div class="min-w-full flex-shrink-0 flex flex-col items-center justify-center snap-center bg-white p-4 rounded-xl border border-blue-200 shadow-inner">
+                    <div class="flex items-center justify-center w-full mb-1">
+                        <span class="text-[0.65rem] uppercase tracking-widest bg-blue-900 text-white px-3 py-0.5 rounded-full font-bold">Pase Individual ${numPase} de ${total}</span>
+                    </div>
+                    <p class="font-bold text-blue-950 text-base my-1 text-center">${nombreAsistente}</p>
+                    <img src="${qrUrl}" alt="QR ${nombreAsistente}" class="w-36 h-36 border-4 border-blue-900 rounded-lg p-1 my-1">
+                    <p class="text-[0.65rem] text-blue-800 mt-1">Desliza para ver el siguiente pase <i class="fa-solid fa-arrow-right ml-1 text-blue-900"></i></p>
+                </div>
+            `;
+
+            qrDots.innerHTML += `<span class="w-2 h-2 rounded-full ${index === 0 ? 'bg-blue-900' : 'bg-blue-300'}"></span>`;
+        });
+    }
+
+    function enviarConfirmacionWhatsApp() {
+        let msj = "Hola, confirmo mi asistencia a los 15 años de Elizabeth.";
+        if (invitadoActual) {
+            let si = [], no = [];
+            document.querySelectorAll('#checkbox-list input').forEach(cb => cb.checked ? si.push(cb.value) : no.push(cb.value));
+
+            msj = `Hola, envío confirmación de asistencia para los 15 de Elizabeth:\n*${invitadoActual.titulo}*\n\n`;
+            if (si.length) msj += `\u2705 *SÍ ASISTIRÁN (${si.length} QR generados):*\n- ` + si.join('\n- ');
+            if (no.length) msj += `\n\n\u274C *NO PODRÁN ASISTIR:*\n- ` + no.join('\n- ');
+        }
+        window.open(`https://api.whatsapp.com/send?phone=${NUMERO_WHATSAPP_RECEPCION}&text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    // =========================================================================
+    // SISTEMA DE CHECK-IN (ESCÁNER QR + REPORTE GOOGLE SHEETS)
+    // =========================================================================
+    function claveCheckIn(grupoTitulo, nombreAsistente) {
+        return `${String(grupoTitulo).trim()}__${String(nombreAsistente).trim()}`;
+    }
+
+    function actualizarContadorCheckIn() {
+        const totalCheckIns = Object.keys(checkInsMap).length;
+        const el = document.getElementById('checkin-counter-text');
+        if (el) el.innerText = `Asistentes con Check-In: ${totalCheckIns}`;
+    }
+
+    async function registrarCheckInAsistente(grupoId, grupoTitulo, nombreAsistente, paseInfo, estadoForzado = null) {
+        const key = claveCheckIn(grupoTitulo, nombreAsistente);
+        const yaEstaba = Boolean(checkInsMap[key]);
+        const nuevoEstado = estadoForzado !== null ? estadoForzado : !yaEstaba;
+        const ahora = new Date().toLocaleString('es-SV');
+
+        if (nuevoEstado) {
+            checkInsMap[key] = {
+                grupoId: grupoId || '-',
+                grupo: grupoTitulo,
+                asistente: nombreAsistente,
+                pase: paseInfo || '1/1',
+                hora: ahora,
+                estado: 'Check-In Confirmado'
+            };
+        } else {
+            delete checkInsMap[key];
+        }
+
+        localStorage.setItem('eli_checkins_map', JSON.stringify(checkInsMap));
+        actualizarContadorCheckIn();
+        renderizarListaInvitadosAdmin();
+
+        try {
+            const resp = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: 'checkIn',
+                    key: key,
+                    checked: nuevoEstado,
+                    grupoId: grupoId || '-',
+                    grupo: grupoTitulo,
+                    asistente: nombreAsistente,
+                    pase: paseInfo || '1/1',
+                    timestamp: ahora
+                })
+            });
+            const data = await resp.json();
+            if (data && data.sheetUrl) {
+                googleSheetUrl = data.sheetUrl;
+                localStorage.setItem('eli_sheet_url', googleSheetUrl);
+            }
+        } catch (e) {}
+    }
+
+    function procesarTextoQREscaneado(decodedText) {
+        const resBox = document.getElementById('checkin-scan-result');
+        resBox.classList.remove('hidden');
+
+        const partes = String(decodedText).split('|').map(s => s.trim());
+        let grupoId = '-';
+        let pase = '1/1';
+        let asistente = '';
+        let grupo = '';
+
+        partes.forEach(p => {
+            if (p.startsWith('ID:')) grupoId = p.replace('ID:', '').trim();
+            if (p.startsWith('PASE')) pase = p.replace('PASE', '').trim();
+            if (p.startsWith('ASISTENTE:')) asistente = p.replace('ASISTENTE:', '').trim();
+            if (p.startsWith('GRUPO:')) grupo = p.replace('GRUPO:', '').trim();
+        });
+
+        if (!asistente && !grupo) {
+            resBox.innerHTML = `<span class="text-blue-900">QR leído: ${decodedText}</span>`;
+            return;
+        }
+
+        registrarCheckInAsistente(grupoId, grupo || asistente, asistente || grupo, pase, true);
+        resBox.innerHTML = `✅ <strong>¡Check-In Registrado!</strong><br>Asistente: <b>${asistente}</b><br>Grupo: ${grupo} (Pase ${pase})`;
+    }
+
+    function toggleEscanerQR() {
+        const wrap = document.getElementById('qr-reader-wrap');
+        if (!wrap.classList.contains('hidden')) {
+            detenerEscanerQR();
+            return;
+        }
+        wrap.classList.remove('hidden');
+
+        if (!html5QrScanner) {
+            html5QrScanner = new Html5Qrcode("qr-reader");
+        }
+
+        html5QrScanner.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 220, height: 220 } },
+            (decodedText) => {
+                procesarTextoQREscaneado(decodedText);
+                detenerEscanerQR();
+            },
+            () => {}
+        ).catch(() => {
+            alert("No se pudo abrir la cámara. Verifica conceder permisos de cámara al navegador.");
+            wrap.classList.add('hidden');
+        });
+    }
+
+    function detenerEscanerQR() {
+        const wrap = document.getElementById('qr-reader-wrap');
+        wrap.classList.add('hidden');
+        if (html5QrScanner) {
+            html5QrScanner.stop().then(() => {
+                html5QrScanner.clear();
+            }).catch(() => {});
+        }
+    }
+
+    async function generarReporteGoogleSheets() {
+        const btn = document.getElementById('btn-sheet-report');
+        const textoOriginal = btn.innerHTML;
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin mr-1.5 text-blue-900"></i> Sincronizando Hoja de Cálculo...`;
+
+        const activos = obtenerListaInvitadosActivos();
+        let rows = [];
+        activos.forEach(item => {
+            item.invitados.forEach((persona, idx) => {
+                const key = claveCheckIn(item.titulo, persona);
+                const info = checkInsMap[key];
+                rows.push({
+                    hora: info ? info.hora : '-',
+                    grupoId: item.id || '-',
+                    grupo: item.titulo,
+                    asistente: persona,
+                    pase: `${idx + 1}/${item.invitados.length}`,
+                    estado: info ? 'Check-In Confirmado' : 'Pendiente'
+                });
+            });
+        });
+
+        try {
+            const resp = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: 'syncSheet',
+                    rows: rows
+                })
+            });
+            const data = await resp.json();
+            btn.innerHTML = textoOriginal;
+
+            if (data && data.sheetUrl) {
+                googleSheetUrl = data.sheetUrl;
+                localStorage.setItem('eli_sheet_url', googleSheetUrl);
+                window.open(googleSheetUrl, '_blank');
+                return;
+            }
+        } catch (e) {
+            btn.innerHTML = textoOriginal;
+        }
+
+        if (googleSheetUrl) {
+            window.open(googleSheetUrl, '_blank');
+        } else {
+            let csv = "\uFEFFFecha y Hora,ID Invitacion,Familia / Grupo,Nombre del Asistente,Pase,Estado Check-In\n";
+            rows.forEach(r => {
+                csv += `"${r.hora}","${r.grupoId}","${r.grupo}","${r.asistente}","${r.pase}","${r.estado}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = "Reporte_CheckIn_15_Elizabeth.csv";
+            link.click();
+        }
+    }
+
+    // =========================================================================
+    // ELIMINAR INVITACIÓN Y RENDERIZAR PANEL ADMIN
+    // =========================================================================
+    async function eliminarInvitacionAdmin(guestId, titulo) {
+        if (!confirm(`¿Seguro que deseas eliminar la invitación de "${titulo}" del panel?`)) return;
+
+        invitadosEliminados.push(String(guestId));
+        localStorage.setItem('eli_deleted_guests', JSON.stringify(invitadosEliminados));
+        renderizarListaInvitadosAdmin();
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: 'deleteGuest',
+                    guestId: String(guestId)
+                })
+            });
+        } catch (e) {}
+    }
+
+    function restaurarInvitadosEliminados() {
+        invitadosEliminados = [];
+        localStorage.setItem('eli_deleted_guests', "[]");
+        renderizarListaInvitadosAdmin();
+    }
+
+    function renderizarListaInvitadosAdmin() {
+        const lista = document.getElementById('admin-guest-list');
+        if (!lista) return;
+        const activos = obtenerListaInvitadosActivos();
+        lista.innerHTML = "";
+
+        activos.forEach((item) => {
+            let confirmadosGrupo = 0;
+            let botonesIntegrantesHtml = "";
+
+            item.invitados.forEach((persona, idx) => {
+                const key = claveCheckIn(item.titulo, persona);
+                const checked = Boolean(checkInsMap[key]);
+                if (checked) confirmadosGrupo++;
+                const paseStr = `${idx + 1}/${item.invitados.length}`;
+                const tituloEsc = item.titulo.replace(/'/g, "\\'");
+                const personaEsc = persona.replace(/'/g, "\\'");
+
+                botonesIntegrantesHtml += `
+                    <button type="button" onclick="registrarCheckInAsistente('${item.id}', '${tituloEsc}', '${personaEsc}', '${paseStr}')" 
+                        class="text-[0.65rem] px-2 py-0.5 rounded-full border font-semibold flex items-center space-x-1 ${checked ? 'bg-blue-900 text-white border-blue-900' : 'bg-blue-50 text-blue-900 border-blue-200'}">
+                        <i class="fa-solid ${checked ? 'fa-check text-white' : 'fa-user-check text-blue-900'} mr-1"></i>
+                        <span>${persona} ${checked ? '(Check-In)' : ''}</span>
+                    </button>`;
+            });
+
+            const tituloSafe = item.titulo.replace(/'/g, "\\'");
+
+            lista.innerHTML += `
+                <div class="p-3 bg-white rounded-xl border border-blue-200 text-xs shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="pr-2">
+                            <p class="font-bold text-blue-950">${item.id}. ${item.titulo}</p>
+                            <p class="text-[0.68rem] text-blue-800">${item.invitados.length} pase(s) • Check-In: <b>${confirmadosGrupo}/${item.invitados.length}</b></p>
+                        </div>
+                        <div class="flex space-x-1 shrink-0">
+                            <button onclick="previsualizarInvitadoPorId('${item.id}')" class="bg-blue-50 text-blue-900 border border-blue-200 font-bold px-2.5 py-1.5 rounded hover:bg-blue-100" title="Ver">
+                                <i class="fa-solid fa-eye text-blue-900"></i>
+                            </button>
+                            <button onclick="enviarSaaSPorId('${item.id}')" class="bg-blue-900 text-white font-bold px-2.5 py-1.5 rounded hover:bg-blue-800 flex items-center" title="Enviar">
+                                <i class="fa-brands fa-whatsapp text-green-400 mr-1 text-sm"></i> Enviar
+                            </button>
+                            <button onclick="eliminarInvitacionAdmin('${item.id}', '${tituloSafe}')" class="bg-white text-blue-900 border border-blue-200 font-bold px-2.5 py-1.5 rounded hover:bg-blue-50" title="Eliminar invitación">
+                                <i class="fa-solid fa-trash-can text-blue-900"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 mt-2 pt-2 border-t border-blue-100">
+                        ${botonesIntegrantesHtml}
+                    </div>
+                </div>`;
+        });
+    }
+
+    function actualizarVistaEstadoGaleria() {
+        const seccionGaleria = document.getElementById('galeria-en-vivo');
+        const label = document.getElementById('gallery-status-label');
+        const btn = document.getElementById('btn-toggle-gallery');
+
+        if (galeriaActiva) {
+            seccionGaleria.classList.remove('hidden');
+            if (label) label.innerText = "Estado: ACTIVO (Visible en la invitación)";
+            if (btn) btn.innerText = "Desactivar Display";
+        } else {
+            seccionGaleria.classList.add('hidden');
+            if (label) label.innerText = "Estado: OCULTO (Desactivado hasta el evento)";
+            if (btn) btn.innerText = "Activar Display";
+        }
+    }
+
+    async function cambiarEstadoGaleria() {
+        galeriaActiva = !galeriaActiva;
+        localStorage.setItem('eli_gallery_active', galeriaActiva ? 'true' : 'false');
+        actualizarVistaEstadoGaleria();
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: 'toggleGallery',
+                    active: galeriaActiva
+                })
+            });
+        } catch (e) {}
+    }
+
+    function abrirAdmin() {
+        document.getElementById('admin-modal').classList.remove('hidden');
+        const baseInput = document.getElementById('admin-base-url');
+        if (!window.location.hostname.includes("googleusercontent.com")) {
+            baseInput.value = window.location.origin + window.location.pathname;
+        }
+        actualizarVistaEstadoGaleria();
+        actualizarContadorCheckIn();
+        renderizarListaInvitadosAdmin();
+        renderizarAdminFotosFijadas();
+    }
+
+    function cerrarAdmin() {
+        detenerEscanerQR();
+        document.getElementById('admin-modal').classList.add('hidden');
+    }
+
+    function previsualizarInvitadoPorId(id) {
+        const todos = [...BASE_INVITADOS, ...invitadosExtra];
+        const encontrado = todos.find(g => String(g.id) === String(id));
+        if (encontrado) {
+            aplicarInvitado(encontrado);
+            cerrarAdmin();
+        }
+    }
+
+    // =========================================================================
+    // ENMASCARADO Y CIFRADO DE URL PARA WHATSAPP
+    // =========================================================================
+    function codificarToken(obj) {
+        return btoa(encodeURIComponent(JSON.stringify(obj)))
+            .replace(/\+/g, '-')
+            .replace(/\//g, '_')
+            .replace(/=+$/, '');
+    }
+
+    function decodificarToken(token) {
+        try {
+            let b64 = String(token).replace(/-/g, '+').replace(/_/g, '/');
+            while (b64.length % 4) b64 += '=';
+            return JSON.parse(decodeURIComponent(atob(b64)));
+        } catch (e) {
+            return null;
+        }
+    }
+
+    async function enmascararUrl(urlCompleta) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 1800);
+            const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlCompleta)}`, {
+                signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            const data = await res.json();
+            if (data && data.shorturl) return data.shorturl;
+        } catch (e) {}
+        return urlCompleta;
+    }
+
+    async function enviarSaaSPorId(id) {
+        const todos = [...BASE_INVITADOS, ...invitadosExtra];
+        const item = todos.find(g => String(g.id) === String(id));
+        if (!item) return;
+
+        const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
+        const token = item.esCustom
+            ? codificarToken({ t: item.titulo, i: item.invitados })
+            : codificarToken({ id: item.id });
+        const linkCifrado = `${baseUrl}?p=${token}`;
+        const linkFinal = await enmascararUrl(linkCifrado);
+
+        const msj = `¡Hola *${item.titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${linkFinal}`;
+        window.open(item.telefono ? `https://api.whatsapp.com/send?phone=${item.telefono}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    function construirCustomObj() {
+        const titulo = document.getElementById('custom-titulo').value.trim() || "Invitado Especial";
+        const invStr = document.getElementById('custom-invitados').value.trim() || titulo;
+        return {
+            id: String(33 + invitadosExtra.length),
+            titulo: titulo,
+            invitados: invStr.split(',').map(s => s.trim()).filter(Boolean)
+        };
+    }
+
+    function probarCustomEnPantalla() {
+        aplicarInvitado(construirCustomObj());
+        cerrarAdmin();
+    }
+
+    async function enviarCustomWhatsApp() {
+        const titulo = document.getElementById('custom-titulo').value.trim();
+        const invStr = document.getElementById('custom-invitados').value.trim();
+
+        if (!titulo || !invStr) {
+            alert("Por favor escribe el Nombre en Portada y los Asistentes.");
+            return;
+        }
+
+        let tel = document.getElementById('custom-tel').value.replace(/\D/g, '');
+        if (tel.length === 8) tel = "503" + tel;
+
+        const nuevoId = String(33 + invitadosExtra.length);
+        const listaAsistentes = invStr.split(',').map(s => s.trim()).filter(Boolean);
+        const nuevoGrupo = {
+            id: nuevoId,
+            telefono: tel,
+            titulo: titulo,
+            invitados: listaAsistentes,
+            esCustom: true
+        };
+        invitadosExtra.push(nuevoGrupo);
+        localStorage.setItem('eli_extra_guests', JSON.stringify(invitadosExtra));
+        renderizarListaInvitadosAdmin();
+
+        const baseUrl = document.getElementById('admin-base-url').value.trim().replace(/\/$/, "");
+        const token = codificarToken({ t: titulo, i: listaAsistentes });
+        const linkCifrado = `${baseUrl}?p=${token}`;
+        const linkFinal = await enmascararUrl(linkCifrado);
+        const msj = `¡Hola *${titulo}*!\n\nTienes una nueva invitación para los *15 Años de Elizabeth*.\nPor favor da clic en el enlace para responder:\n${linkFinal}`;
+
+        window.open(tel ? `https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msj)}` : `https://api.whatsapp.com/send?text=${encodeURIComponent(msj)}`, '_blank');
+    }
+
+    // =========================================================================
+    // GALERÍA EN VIVO CONECTADA A TU CARPETA DE GOOGLE DRIVE
+    // =========================================================================
+    function optimizarUrlDrive(url) {
+        const match = String(url).match(/[?&]id=([^&]+)/) || String(url).match(/\/d\/([^/=]+)/);
+        if (match && match[1]) {
+            return `https://drive.google.com/thumbnail?id=${match[1]}&sz=w1000`;
+        }
+        return url;
+    }
+
+    function extraerIdFoto(url) {
+        const match = String(url).match(/[?&]id=([^&]+)/) || String(url).match(/\/d\/([^/=]+)/);
+        return match && match[1] ? match[1] : url;
+    }
+
+    function obtenerFotosFijadas() {
+        try {
+            return JSON.parse(localStorage.getItem('eli_pinned_photos') || "[]");
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function alternarFotoFijada(url) {
+        let fijadas = obtenerFotosFijadas();
+        if (fijadas.includes(url)) {
+            fijadas = fijadas.filter(u => u !== url);
+        } else if (fijadas.length < 6) {
+            fijadas.push(url);
+        }
+        localStorage.setItem('eli_pinned_photos', JSON.stringify(fijadas));
+        mostrarFotosEnReel();
+        renderizarAdminFotosFijadas();
+    }
+
+    async function eliminarFotoAdmin(url) {
+        if (!confirm("¿Seguro que deseas eliminar esta foto del álbum?")) return;
+        const fileId = extraerIdFoto(url);
+
+        fotosRecibidasDrive = fotosRecibidasDrive.filter(u => u !== url);
+        mostrarFotosEnReel();
+        renderizarAdminFotosFijadas();
+
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: 'delete',
+                    fileId: fileId
+                })
+            });
+            await cargarGaleria();
+        } catch (e) {}
+    }
+
+    function renderizarAdminFotosFijadas() {
+        const box = document.getElementById('admin-pin-photos');
+        if (!box) return;
+        if (fotosRecibidasDrive.length === 0) {
+            box.innerHTML = '<span class="text-[0.68rem] text-blue-800 italic">Aún no hay fotos en la carpeta de Drive.</span>';
+            return;
+        }
+        const fijadas = obtenerFotosFijadas();
+        box.innerHTML = "";
+        fotosRecibidasDrive.forEach(url => {
+            const esFija = fijadas.includes(url);
+            box.innerHTML += `
+                <div class="relative flex-shrink-0 w-20 h-24 rounded-lg overflow-hidden border-2 ${esFija ? 'border-blue-900' : 'border-blue-200'} bg-white shadow-sm">
+                    <img src="${url}" referrerpolicy="no-referrer" class="w-full h-full object-cover">
+                    <button type="button" onclick="alternarFotoFijada('${url}')" class="absolute top-1 left-1 bg-blue-900/90 text-white text-[0.6rem] w-6 h-6 rounded-full flex items-center justify-center shadow" title="Fijar">
+                        <i class="fa-solid fa-thumbtack ${esFija ? 'text-white' : 'opacity-50'}"></i>
+                    </button>
+                    <button type="button" onclick="eliminarFotoAdmin('${url}')" class="absolute top-1 right-1 bg-white/95 text-blue-900 border border-blue-200 text-[0.65rem] w-6 h-6 rounded-full flex items-center justify-center shadow" title="Eliminar">
+                        <i class="fa-solid fa-trash-can text-blue-900"></i>
+                    </button>
+                </div>`;
+        });
+    }
+
+    function abrirLightbox(url) {
+        const modal = document.getElementById('lightbox-modal');
+        const img = document.getElementById('lightbox-img');
+        img.src = url;
+        modal.classList.remove('hidden');
+    }
+
+    function cerrarLightbox() {
+        document.getElementById('lightbox-modal').classList.add('hidden');
+    }
+
+    function mostrarFotosEnReel() {
+        const container = document.getElementById('gallery-container');
+        const badge = document.getElementById('album-count-badge');
+        if (badge) badge.innerText = fotosRecibidasDrive.length;
+
+        const fijadas = obtenerFotosFijadas();
+        const noFijadas = fotosRecibidasDrive.filter(u => !fijadas.includes(u));
+        const listaFinal = [...fijadas, ...noFijadas].slice(0, 6);
+
+        container.innerHTML = "";
+        if (listaFinal.length === 0) {
+            container.innerHTML = '<p class="text-xs text-blue-900 w-full my-10 font-semibold">Sube la primera foto para inaugurar el álbum en vivo.</p>';
+            return;
+        }
+
+        listaFinal.forEach((url, i) => {
+            const esFija = fijadas.includes(url);
+            container.innerHTML += `
+                <div onclick="abrirLightbox('${url}')" class="relative w-52 h-64 flex-shrink-0 snap-center cursor-pointer">
+                    <img src="${url}" referrerpolicy="no-referrer" alt="Foto ${i + 1}" class="w-full h-full object-cover rounded-xl border-2 border-white shadow-md">
+                    ${esFija ? '<span class="absolute top-2 right-2 bg-blue-900 text-white text-[0.6rem] font-bold px-2 py-0.5 rounded-full shadow"><i class="fa-solid fa-thumbtack mr-1 text-white"></i>Destacada</span>' : ''}
+                </div>`;
+        });
+    }
+
+    function abrirGaleriaCompleta() {
+        const modal = document.getElementById('full-gallery-modal');
+        const grid = document.getElementById('full-gallery-grid');
+        modal.classList.remove('hidden');
+
+        if (fotosRecibidasDrive.length === 0) {
+            grid.innerHTML = '<p class="col-span-2 text-xs text-center text-blue-900 py-8">Aún no hay fotos guardadas en la carpeta de Google Drive.</p>';
+            return;
+        }
+
+        grid.innerHTML = "";
+        fotosRecibidasDrive.forEach((url, idx) => {
+            grid.innerHTML += `
+                <div onclick="abrirLightbox('${url}')" class="cursor-pointer block overflow-hidden rounded-xl border border-blue-200 shadow-sm">
+                    <img src="${url}" referrerpolicy="no-referrer" alt="Foto ${idx + 1}" class="w-full h-40 object-cover hover:scale-105 transition">
+                </div>`;
+        });
+    }
+
+    function cerrarGaleriaCompleta() {
+        document.getElementById('full-gallery-modal').classList.add('hidden');
+    }
+
+    async function cargarGaleria() {
+        try {
+            const response = await fetch(SCRIPT_URL + "?t=" + Date.now(), {
+                method: 'GET',
+                redirect: 'follow'
+            });
+            const data = await response.json();
+
+            if (data && typeof data.galleryActive === 'boolean') {
+                galeriaActiva = data.galleryActive;
+                localStorage.setItem('eli_gallery_active', galeriaActiva ? 'true' : 'false');
+                actualizarVistaEstadoGaleria();
+            }
+
+            if (data && data.folderUrl) {
+                const btnFolder = document.getElementById('drive-folder-link');
+                if (btnFolder) btnFolder.href = data.folderUrl;
+            }
+
+            if (data && data.sheetUrl) {
+                googleSheetUrl = data.sheetUrl;
+                localStorage.setItem('eli_sheet_url', googleSheetUrl);
+            }
+
+            if (data && data.checkIns && typeof data.checkIns === 'object') {
+                checkInsMap = { ...checkInsMap, ...data.checkIns };
+                localStorage.setItem('eli_checkins_map', JSON.stringify(checkInsMap));
+                actualizarContadorCheckIn();
+            }
+
+            const lista = Array.isArray(data) ? data : (data.urls || (Array.isArray(data.photos) ? data.photos.map(p => p.url) : []));
+            fotosRecibidasDrive = lista.map(optimizarUrlDrive);
+            mostrarFotosEnReel();
+            renderizarAdminFotosFijadas();
+        } catch (e) {
+            mostrarFotosEnReel();
+        }
+    }
+
+    function comprimirImagen(file, maxWidth = 1200, quality = 0.78) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    resolve({
+                        base64: dataUrl.split(',')[1],
+                        mimeType: 'image/jpeg',
+                        fileName: "15Eli_" + Date.now() + ".jpg"
+                    });
+                };
+                img.onerror = reject;
+                img.src = event.target.result;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+
+    async function subirFotoDrive() {
+        const input = document.getElementById('foto-upload');
+        if (!input.files || !input.files[0]) return;
+
+        const file = input.files[0];
+        const status = document.getElementById('upload-status');
+
+        status.innerText = "Guardando foto en Google Drive... ⏳";
+        status.className = "text-xs font-bold mt-3 text-blue-900 block";
+
+        try {
+            const optimizada = await comprimirImagen(file);
+
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                redirect: 'follow',
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: 'upload',
+                    fileName: optimizada.fileName,
+                    mimeType: optimizada.mimeType,
+                    base64: optimizada.base64
+                })
+            });
+
+            const result = await response.json();
+
+            if (result && result.success === false) {
+                throw new Error(result.error || "Error en Drive");
+            }
+
+            status.innerText = "¡Foto guardada en el álbum para todos los invitados!";
+            status.className = "text-xs font-bold mt-3 text-blue-900 block";
+            input.value = "";
+
+            await cargarGaleria();
+            setTimeout(() => { status.classList.add('hidden'); }, 4000);
+        } catch (e) {
+            status.innerText = "Error al guardar en Drive. Verifica haber publicado la 'Nueva versión' en Apps Script.";
+            status.className = "text-xs font-bold mt-3 text-blue-900 block";
+        }
+    }
+
+    // =========================================================================
+    // INICIALIZACIÓN AL CARGAR LA PÁGINA (LEE ?p=... CIFRADO Y LINKS ANTERIORES)
+    // =========================================================================
+    document.addEventListener("DOMContentLoaded", () => {
+        actualizarVistaEstadoGaleria();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const paramP = urlParams.get('p');
+        const paramTitulo = urlParams.get('titulo');
+
+        if (paramP) {
+            const dec = decodificarToken(paramP);
+            if (dec && dec.t) {
+                aplicarInvitado({
+                    id: "",
+                    titulo: dec.t,
+                    invitados: Array.isArray(dec.i) ? dec.i : [dec.t]
+                });
+            } else if (dec && dec.id) {
+                const todos = [...BASE_INVITADOS, ...invitadosExtra];
+                const guest = todos.find(g => String(g.id) === String(dec.id));
+                if (guest) aplicarInvitado(guest);
+                else generarQRs();
+            } else {
+                generarQRs();
+            }
+        } else if (paramTitulo) {
+            aplicarInvitado({
+                id: "",
+                titulo: paramTitulo,
+                invitados: (urlParams.get('invitados') || paramTitulo).split(',').map(s => s.trim()).filter(Boolean)
+            });
+        } else {
+            const id = urlParams.get('id');
+            if (id) {
+                const todos = [...BASE_INVITADOS, ...invitadosExtra];
+                const guest = todos.find(g => String(g.id) === String(id));
+                if (guest) aplicarInvitado(guest);
+                else generarQRs();
+            } else {
+                generarQRs();
+            }
+        }
+
+        cargarGaleria();
+        setInterval(cargarGaleria, 20000);
+    });
+
+    // =========================================================================
+    // LÓGICA DE AUDIO Y BOTÓN FLOTANTE
+    // =========================================================================
+    var isPlaying = false, isOpened = false, player = null;
+
+    function cmdYT(f, a) {
+        const i = document.getElementById('youtube-player');
+        if (i && i.contentWindow) {
+            i.contentWindow.postMessage(JSON.stringify({ event: 'command', func: f, args: a || [] }), '*');
+        }
+    }
+
+    function abrirInvitacion() {
+        if (isOpened) return;
+        isOpened = true;
+        document.getElementById('invitation-overlay').style.opacity = '0';
+        document.getElementById('invitation-overlay').style.pointerEvents = 'none';
+        setTimeout(() => document.getElementById('invitation-overlay').style.zIndex = '-10', 500);
+
+        document.getElementById('floating-music-btn').classList.remove('hidden');
+
+        cmdYT('unMute');
+        cmdYT('setVolume', [100]);
+        cmdYT('playVideo');
+        document.getElementById('mute-icon-float').className = 'fa-solid fa-volume-high text-white';
+        isPlaying = true;
+    }
+
+    function toggleMusica() {
+        if (isPlaying) {
+            cmdYT('pauseVideo');
+            document.getElementById('mute-icon-float').className = 'fa-solid fa-volume-xmark text-white';
+        } else {
+            cmdYT('unMute');
+            cmdYT('playVideo');
+            document.getElementById('mute-icon-float').className = 'fa-solid fa-volume-high text-white';
+        }
+        isPlaying = !isPlaying;
+    }
+
+    setInterval(() => {
+        if (!isOpened && document.activeElement && document.activeElement.id === 'youtube-player') {
+            abrirInvitacion();
+        }
+    }, 80);
+
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+
+    function onYouTubeIframeAPIReady() {
+        player = new YT.Player('youtube-player', {
+            events: {
+                'onStateChange': e => {
+                    if (e.data === 1 && !isOpened) abrirInvitacion();
+                }
+            }
+        });
+    }
+
+    // =========================================================================
+    // CONTADOR REGRESIVO (13 DE DICIEMBRE DE 2026 - 10:00 AM)
+    // =========================================================================
+    const countDownDate = new Date("Dec 13, 2026 10:00:00").getTime();
+    setInterval(() => {
+        const d = countDownDate - new Date().getTime();
+        if (d < 0) return;
+        document.getElementById("days").innerText = String(Math.floor(d / 86400000)).padStart(2, '0');
+        document.getElementById("hours").innerText = String(Math.floor((d % 86400000) / 3600000)).padStart(2, '0');
+        document.getElementById("minutes").innerText = String(Math.floor((d % 3600000) / 60000)).padStart(2, '0');
+        document.getElementById("seconds").innerText = String(Math.floor((d % 60000) / 1000)).padStart(2, '0');
+    }, 1000);
+</script>
+</body>
+</html>
